@@ -1,0 +1,25 @@
+<div class="sfb-filetable">
+	<table data-ng-controller="sfbFileTableController">
+		<thead>
+		<tr>
+			<th>name</th>
+			<th>type</th>
+			<th>date</th>
+			<th>size</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr
+			data-ng-click="select(file)"
+			data-ng-dblclick="choose(file)"
+			data-ng-repeat="file in files"
+			class="{{file.selected?'selected':''}}"
+		>
+			<td>{{file.name}}</td>
+			<td>{{file.type}}</td>
+			<td>{{file.date}}</td>
+			<td>{{file.size}}</td>
+		</tr>
+		</tbody>
+	</table>
+</div>

@@ -1,0 +1,34 @@
+.lt(@x:0,@y:0,@position:absolute){
+	position: @position;
+	left: @x*1px;
+	top: @y*1px;
+}
+.lb(@x:0,@y:0,@position:absolute){
+	position: @position;
+	left: @x*1px;
+	bottom: @y*1px;
+}
+.rt(@x:0,@y:0,@position:absolute){
+	position: @position;
+	right: @x*1px;
+	top: @y*1px;
+}
+.rb(@x:0,@y:0,@position:absolute){
+	position: @position;
+	right: @x*1px;
+	bottom: @y*1px;
+}
+.dim(@w:0,@h:0){
+	width: @w*1px;
+	height: @h*1px;
+}
+.mindim(@w:0,@h:0){
+	min-width: @w*1px;
+	min-height: @h*1px;
+}
+.border-radius(@r:4){
+	.border-left-radius(@r*1px);
+	.border-right-radius(@r*1px);
+	.border-top-radius(@r*1px);
+	.border-bottom-radius(@r*1px);
+}

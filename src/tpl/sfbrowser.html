@@ -1,0 +1,31 @@
+<div class="sfb sfb-modal" data-ng-app>
+	<div class="sfb-window sfb-{{layout}}" data-ng-controller="sfbWindowController"
+			style="
+				left:{{x}}px;
+				top:{{y}}px;
+				width:{{w}}px;
+				height:{{h}}px;
+			">
+		<h3>SFBrowser</h3>
+		<div class="sfb-window-buttons">
+			<button data-ng-click="fullscreen()" class="icon-expand"></button>
+			<button data-ng-click="close()"		 class="icon-close"></button>
+		</div>
+
+		<ng-include src="menuMain"></ng-include>
+		<ng-include src="fileTable"></ng-include>
+		<div>
+			<button type="button" class="btn btn-default btn-sm">Cancel</button>
+			<button type="button" class="btn btn-primary btn-sm">Select</button>
+		</div>
+		<div class="sfb-move" draggable="move"></div>
+		<div class="sfb-resize-l"  draggable="resize-l"></div>
+		<div class="sfb-resize-r"  draggable="resize-r"></div>
+		<div class="sfb-resize-t"  draggable="resize-t"></div>
+		<div class="sfb-resize-b"  draggable="resize-b"></div>
+		<div class="sfb-resize-tl" draggable="resize-tl"></div>
+		<div class="sfb-resize-tr" draggable="resize-tr"></div>
+		<div class="sfb-resize-bl" draggable="resize-bl"></div>
+		<div class="sfb-resize-br" draggable="resize-br"></div>
+	</div>
+</div>
