@@ -14,7 +14,7 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 		,sUriTemplates = 'sfbrowser.html'
 		,sUriAPI = 'json/dir.json'
 		//
-		,mSFB = {}//
+		,oSFBInjector
 		// document.createElement('div')//
 		,iCntInstance = 0
 	;
@@ -30,7 +30,7 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 	}
 	function initModule(){
 		console.log('initModule'); // log
-		var oSFB = angular.module('sfbrowser',['ngResource'])
+		angular.module('sfbrowser',['ngResource'])
 //				.config(function($provide, $compileProvider, $filterProvider) {
 //					$provide.value('templates', '');
 //					$provide.factory('getTemplates', function($rootScope) { return $rootScope.templates; });
@@ -44,13 +44,9 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 //					console.log('foobar',$http,$injector,$rootScope); // log
 //					return '12341234'
 //				})
-			.run(function($http,$injector,$rootScope,$templateCache){
-				console.log('foo?'); // log
+			.run(function($http,$injector){
 				$http.get(sUriTemplates).success(function(response){
-					oSFB.value('templates', response);
           			$injector.get('$compile')(response);
-					$rootScope.sfbrowserhtml = $templateCache.get('sfbrowser.html');
-					console.log('bar?'); // log
 				});
 			})
 			.factory('SfbList',function($resource) {
@@ -60,11 +56,15 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 			})
 			.factory('createSfbElement',function($templateCache) {
 				return function(){
-					return angular.element($templateCache.get('sfbrowser.html'))[0]
+					var mElement = angular.element($templateCache.get('sfbrowser.html'))[0]
+					document.body.appendChild(mElement);
+					return mElement;
 				};
 			})
 		;
-		angular.bootstrap(mSFB, ['sfbrowser']);
+		var oSFB = {}; // todo: hoist
+		angular.bootstrap(oSFB, ['sfbrowser']);
+		oSFBInjector = angular.element(oSFB).injector();
 		//
 		////////////////////////////////////////////////////////
 		//
@@ -77,17 +77,20 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 	 * Initialise
 	 */
 	function init(options) {
-		options = angular.extend({
-			directory:''
-		},options);
-		//
-		var sName = 'sfb-inst-'+(iCntInstance++)
-			,oSfbInjector = angular.element(mSFB).injector()
-			,mInst = oSfbInjector.get('createSfbElement')();
-		angular.module(sName,['sfbrowser'])
-//			.config(function($provide, $compileProvider, $filterProvider) {
-//				$provide.value('layout', 'list');
-//			})
+		angular.module('sfbInstance',[])
+			.constant('SfbList',oSFBInjector.get('SfbList'))
+			.constant('$templateCache',oSFBInjector.get('$templateCache'))
+			.config(function($provide, $compileProvider, $filterProvider) {
+				//$provide.value('layout', 'list');
+				angular.forEach(angular.extend({
+					directory:''
+					,callback: function(files){console.log(files)}
+				},options),function(value,key) {
+//					this.push(key + ': ' + value);
+					$provide.value(key,value);
+//					.constant('SfbList',oSFBInjector.get('SfbList'))
+				});
+			})
 //			.config(['$provide', function($provide){
 //				$provide.decorator('$rootScope', ['$delegate', function($delegate){
 //					Object.defineProperty($delegate.constructor.prototype, '$onRootScope', {
@@ -100,9 +103,9 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 //					return $delegate;
 //				}]);
 //			}])
-			.run(function($injector,templates){
-          		$injector.get('$compile')(templates);
-			})
+//			.run(function($injector,templates){
+//          		$injector.get('$compile')(templates);
+//			})
 //			.factory('mySharedService', function($rootScope) {
 //				var sharedService = {};
 //				sharedService.message = '';
@@ -115,7 +118,7 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 //				};
 //				return sharedService;
 //			})
-			.controller('sfbWindowController',function($scope,$rootScope) {
+			.controller('sfbWindowController',function($scope,$rootScope,$element) {
 				$scope.menuMain = 'menuMain.html';
 				$scope.fileTable = 'fileTable.html';
 				$scope.layout = 'list';
@@ -127,6 +130,10 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 				$scope.h = 300;
 				$scope.sw = 300;
 				$scope.sh = 300;
+
+				console.log('$element',$element); // log
+				$element.css({border:'1px solid red'});
+				$element.css({background:'green'});
 
 				handleWindowResize();
 				window.addEventListener('resize',handleWindowResize,false);
@@ -252,8 +259,14 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 					$scope.h = $scope.sh;
 				};
 				$scope.close = function(){
-					document.body.removeChild(mInst);
+					$element.remove();
 				};
+
+//				var unWatchX = $scope.$watch('x', function(newVal, oldVal) {
+//					console.log('x x'); // log
+//					$scope.$apply();
+//					unWatchX();
+//				});
 			})
 			.directive('draggable', function($rootScope) {
 				function link(scope, element, attrs) {
@@ -271,13 +284,16 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 						document.addEventListener('mouseup',handleDocumentMouseUp,false);
 						oBodyClass.add('userSelectNone');
 					}
-					function handleDocumentMouseMove(e){
-						$rootScope.$emit(sEmit,e.pageX-iOffsetX,e.pageY-iOffsetY);
-					}
 					function handleDocumentMouseUp(){
 						document.removeEventListener('mousemove',handleDocumentMouseMove);
 						document.removeEventListener('mousemove',handleDocumentMouseUp);
 						oBodyClass.remove('userSelectNone');
+					}
+					function handleDocumentMouseMove(e){
+//						element.css({border:'1px solid red'});
+//						angular.element(scope).css({border:'1px solid red'});
+//						console.log('$rootScope',$rootScope); // log
+						$rootScope.$emit(sEmit,e.pageX-iOffsetX,e.pageY-iOffsetY);
 					}
 				}
 
@@ -291,8 +307,12 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 					$rootScope.$emit('view');
 				};
 			})
-			.controller('sfbFileTableController',function($scope,SfbList,$element) {
+			.controller('sfbFileTableController',function($scope,SfbList,callback) {
 				$scope.files = SfbList.query();
+				var unWatchFiles = $scope.$watch('files', function(){
+					setTimeout(function(){$scope.$apply()},40); // yeah that's ugly but view won't render initially
+					unWatchFiles();
+				});
 
 				$scope.select = function(file){
 					file.selected = !file.selected;
@@ -305,14 +325,12 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 							aSelected.push(file);
 						}
 					});
-					console.log('choose'
-						,aSelected
-					);
+					callback(aSelected);
 				};
 			})
 		;
-        angular.bootstrap(mInst, [sName]);
-		document.body.appendChild(mInst);
+        angular.bootstrap(oSFBInjector.get('createSfbElement')(), ['sfbInstance']);
+        //angular.bootstrap(oSFBInjector.get('createSfbElement')(), ['sfbInstance']);
 	}
 
 	/////////////////////////////////////////////////////////

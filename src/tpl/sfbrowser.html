@@ -1,5 +1,5 @@
-<div class="sfb sfb-modal" data-ng-app>
-	<div class="sfb-window sfb-{{layout}}" data-ng-controller="sfbWindowController"
+<div class="sfb sfb-modal" data-ng-controller="sfbWindowController">
+	<div class="sfb-window sfb-{{layout}}"
 			style="
 				left:{{x}}px;
 				top:{{y}}px;
@@ -11,7 +11,6 @@
 			<button data-ng-click="fullscreen()" class="icon-expand"></button>
 			<button data-ng-click="close()"		 class="icon-close"></button>
 		</div>
-
 		<ng-include src="menuMain"></ng-include>
 		<ng-include src="fileTable"></ng-include>
 		<div>
