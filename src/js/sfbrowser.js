@@ -14,7 +14,8 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 		,sUriTemplates = 'sfbrowser.html'
 		,sUriAPI = 'json/dir.json'
 		//
-		,mSFB = document.createElement('div')//{}//
+		,mSFB = {}//
+		// document.createElement('div')//
 		,iCntInstance = 0
 	;
 	// try to load from CDN or fallback to local files (and one by one or sometimes error)
@@ -28,50 +29,47 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 		loadScripts(sUriCSS).then(initModule);
 	}
 	function initModule(){
-		angular.module('sfbrowser',['ngResource'])
+		console.log('initModule'); // log
+		var oSFB = angular.module('sfbrowser',['ngResource'])
 //				.config(function($provide, $compileProvider, $filterProvider) {
 //					$provide.value('templates', '');
 //					$provide.factory('getTemplates', function($rootScope) { return $rootScope.templates; });
 //					$provide.factory('hi', function() { console.log('hello'); });
 //					$compileProvider.directive('directiveName', ...);
 //					$filterProvider.register('filterName', ...);
+//					console.log('config?'); // log
 //				})
 //				.value('foobar',1234)
 //				.factory('foar',function($http,$injector,$rootScope){
 //					console.log('foobar',$http,$injector,$rootScope); // log
 //					return '12341234'
 //				})
-			.run(function($http,$injector,$rootScope){
+			.run(function($http,$injector,$rootScope,$templateCache){
+				console.log('foo?'); // log
 				$http.get(sUriTemplates).success(function(response){
-					//$injector.get('$compile')(response);
-					$rootScope.templates = response;
-					var rxScriptG = /<script\b[^>]*>([\s\S]*?)<\/script>/g
-						,rxScript = /<script\b[^>]*>([\s\S]*?)<\/script>/
-						,aScripts = response.match(rxScriptG)
-						,oTpl = {};
-					aScripts&&aScripts.forEach(function(s){
-						oTpl[s.match(/id=\"([^"]*)/)[1]] = s.match(rxScript)[1];
-					});
-					$rootScope.sfbrowserhtml = oTpl['sfbrowser.html'];
+					oSFB.value('templates', response);
+          			$injector.get('$compile')(response);
+					$rootScope.sfbrowserhtml = $templateCache.get('sfbrowser.html');
+					console.log('bar?'); // log
 				});
 			})
-			.factory('SfbList',function ($resource) {
+			.factory('SfbList',function($resource) {
 				return $resource(sUriAPI,{},{
 					query: {method: 'GET', params:{}, isArray: true}
 				});
+			})
+			.factory('createSfbElement',function($templateCache) {
+				return function(){
+					return angular.element($templateCache.get('sfbrowser.html'))[0]
+				};
 			})
 		;
 		angular.bootstrap(mSFB, ['sfbrowser']);
 		//
 		////////////////////////////////////////////////////////
 		//
-		var sfbscope = angular.element(mSFB).scope();
-//		console.log('ext',angular.module('sfbrowser').controller('Foo')); // log
-//		console.log('ext',sfbscope,sfbscope.getHTML()); // log
-		setTimeout(function (){
-//			console.log('ext',sfbscope,sfbscope.getHTML()); // log
-			console.log('ext',angular.element(mSFB).scope().templates); // log
-		},1000);
+		//var sfbscope = angular.element(mSFB).scope();
+		//console.log('sfbscope',sfbscope); // log
 		setTimeout(init,1000);
 	}
 
@@ -83,9 +81,9 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 			directory:''
 		},options);
 		//
-		var sfbScope = angular.element(mSFB).scope()
-			,sName = 'sfb-inst-'+(iCntInstance++)
-			,mInst = angular.element(sfbScope.sfbrowserhtml)[0];
+		var sName = 'sfb-inst-'+(iCntInstance++)
+			,oSfbInjector = angular.element(mSFB).injector()
+			,mInst = oSfbInjector.get('createSfbElement')();
 		angular.module(sName,['sfbrowser'])
 //			.config(function($provide, $compileProvider, $filterProvider) {
 //				$provide.value('layout', 'list');
@@ -102,9 +100,8 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 //					return $delegate;
 //				}]);
 //			}])
-			.run(function($injector){
-//				console.log('$element',$element); // log
-          		$injector.get('$compile')(angular.element(mSFB).scope().templates);
+			.run(function($injector,templates){
+          		$injector.get('$compile')(templates);
 			})
 //			.factory('mySharedService', function($rootScope) {
 //				var sharedService = {};
@@ -118,7 +115,7 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 //				};
 //				return sharedService;
 //			})
-			.controller('sfbWindowController',function($scope,$rootScope,$element) {
+			.controller('sfbWindowController',function($scope,$rootScope) {
 				$scope.menuMain = 'menuMain.html';
 				$scope.fileTable = 'fileTable.html';
 				$scope.layout = 'list';
@@ -346,6 +343,7 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 	 * Load javascript file
 	 * @method
 	 * @param {Array|String} srcList The source location of the file.
+	 * @param {Boolean} sequential Load sequential or simultaneaously.
 	 * @return {Object} promise
 	 */
 	function loadScripts(srcList,sequential) {
@@ -398,38 +396,6 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 			}
 		};
 	}
-
-	//
-	function randomFiles(){
-		var lorem = rndFrom('lorem,ipsum,dolor,sit,amet,consectetur,adipiscing,elit,ut,aliquam,purus,amet,luctus,venenatis,lectus,magna,fringilla,urna,porttitor,rhoncus,non,enim,praesent,elementum,facilisis,leo,vel,est,ullamcorper,eget,nulla,facilisi,etiam,dignissim,diam,quis,lobortis,scelerisque,fermentum,dui,faucibus,in,ornare,quam,viverra,orci,sagittis,eu,volutpat,odio,mauris,massa,vitae,tortor,condimentum,lacinia,eros,donec,ac,tempor,dapibus,ultrices,iaculis,nunc,sed,augue,lacus,congue,eu,consequat,felis,et,pellentesque,commodo,egestas,phasellus,eleifend,pretium,vulputate,sapien,nec,aliquam,malesuada,bibendum,arcu,curabitur,velit,sodales,sem,integer,justo,vestibulum,risus,ultricies,tristique,aliquet,tortor,at,auctor,urna,id,cursus,metus,mi,posuere,sollicitudin,orci,a,semper,duis,tellus,mattis,nibh,proin,nisl,venenatis,a,habitant,morbi,senectus,netus,fames,turpis,tempus,pharetra,pharetra,mi,hendrerit,gravida,blandit,hac,habitasse,platea,dictumst,quisque,sagittis,consequat,nisi,suscipit,maecenas,cras,aenean,placerat,vestibulum,eros,tincidunt,erat,imperdiet,euismod,nisi,porta,mollis,leo,nisl,ipsum,nec,nullam,feugiat,fusce,suspendisse,potenti,vivamus,dictum,varius,sapien,molestie,ac,massa,accumsan,vitae,arcu,vel,dolor,enim,neque,convallis,neque,tempus,nam,pulvinar,laoreet,interdum,libero,est,tempor,elementum,nunc,risus,cum,sociis,natoque,penatibus,magnis,dis,parturient,montes,nascetur,ridiculus,mus,accumsan,lacus,volutpat,dui,ligula,libero,justo,diam,rhoncus,felis,et,mauris,ante,metus,commodo,velit,non,tellus,purus,rutrum,fermentum,pretium,elit,vehicula'.split(','))
-			,type = rndFrom('jpg,jpeg,png,gif,txt,as,md,js,html,xml,'.split(','))
-			,aFiles = []
-		;
-		for (var i=0;i<23;i++) {
-			var sType = type()
-				,sName = lorem()
-				,sFile = sName+'.'+sType
-				,iTime = Math.random()*1.4E12<<0
-			;
-			aFiles.push({
-				 name: sFile
-				,path: 'data/'+sFile
-				,type: sType
-				,size: Math.random()*1E4<<0
-				,time: iTime
-				,date: new Date(iTime)
-			});
-		}
-		function rndFrom(a){
-			var i = a.length;
-			return function(){
-				return a[Math.random()*i<<0]
-			}
-		}
-		return aFiles;
-	}
-
-	//
 	//
 	return {
 		init: init
