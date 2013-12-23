@@ -2,23 +2,29 @@
 	<table data-ng-controller="sfbFileTableController">
 		<thead>
 		<tr>
-			<th>name</th>
+			<th data-ng-click="theadSize($event)">name</th>
 			<th>type</th>
 			<th>date</th>
 			<th>size</th>
+			<th>dimensions</th>
 		</tr>
 		</thead>
 		<tbody>
 		<tr
-			data-ng-click="select(file)"
-			data-ng-dblclick="choose(file)"
+			data-ng-click="handleTrClick($event,file)"
+			data-ng-dblclick="handleTrDblClick(file)"
 			data-ng-repeat="file in files"
 			class="{{file.selected?'selected':''}}"
 		>
-			<td>{{file.name}}</td>
-			<td>{{file.type}}</td>
-			<td>{{file.date}}</td>
-			<td>{{file.size}}</td>
+			<td style="{{icon(file)}}"><input type="text"
+				data-ng-keyup="handleFileKeyUp($event)"
+				data-ng-model="file.name"
+				disabled
+			/></td>
+			<td>{{file.ext}}</td>
+			<td data-time="{{file.time}}">{{file.time*1000|date:'yyyy-MM-dd'}}</td>
+			<td>{{formatSize(file)}}</td>
+			<td>{{fileDimensions(file)}}</td>
 		</tr>
 		</tbody>
 	</table>

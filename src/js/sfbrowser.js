@@ -12,7 +12,8 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 		,sUriAngularResource = 'js/vendor/angular-resource.min.js'
 		,sUriCSS = 'css/sfbrowser.css'
 		,sUriTemplates = 'sfbrowser.html'
-		,sUriAPI = 'json/dir.json'
+//		,sUriAPI = 'json/dir.json'
+		,sUriAPI = 'connector/php'
 		//
 		,oSFBInjector
 		// document.createElement('div')//
@@ -31,27 +32,44 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 	function initModule(){
 		console.log('initModule'); // log
 		angular.module('sfbrowser',['ngResource'])
-//				.config(function($provide, $compileProvider, $filterProvider) {
-//					$provide.value('templates', '');
-//					$provide.factory('getTemplates', function($rootScope) { return $rootScope.templates; });
-//					$provide.factory('hi', function() { console.log('hello'); });
-//					$compileProvider.directive('directiveName', ...);
-//					$filterProvider.register('filterName', ...);
-//					console.log('config?'); // log
-//				})
-//				.value('foobar',1234)
-//				.factory('foar',function($http,$injector,$rootScope){
-//					console.log('foobar',$http,$injector,$rootScope); // log
-//					return '12341234'
-//				})
+			.config(function($provide, $compileProvider, $filterProvider) {
+			})
 			.run(function($http,$injector){
 				$http.get(sUriTemplates).success(function(response){
           			$injector.get('$compile')(response);
 				});
 			})
-			.factory('SfbList',function($resource) {
-				return $resource(sUriAPI,{},{
-					query: {method: 'GET', params:{}, isArray: true}
+			.factory('key',function($document) {
+				var key = angular.extend({
+					ESC:	27
+					,F2:	113
+					,HOME:	36
+					,DEL:	46
+					,CTRL:	17
+					,SHIFT:	16
+					,RETURN:	13
+					,SPACE:	32
+					,LEFT:	37
+					,UP:	38
+					,RIGHT:	39
+					,DOWN:	40
+					,keyUp: function(callback){
+
+					}
+				},[]);
+				$document.on('keydown',function(e){
+					key[e.keyCode] = true;
+
+					//console.log('keydown',e.keyCode); // log
+				});
+				$document.on('keyup',function(e){
+					key[e.keyCode] = false;
+				});
+				return key;
+			})
+			.factory('SfbApi',function($resource) {
+				return $resource(sUriAPI+'/list/:folder',{},{
+					query: {method: 'POST', params:{folder:encodeURIComponent('../../data')}, isArray: true}
 				});
 			})
 			.factory('createSfbElement',function($templateCache) {
@@ -62,14 +80,12 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 				};
 			})
 		;
-		var oSFB = {}; // todo: hoist
+		var mSFB
+			,oSFB = {}; // todo: hoist
 		angular.bootstrap(oSFB, ['sfbrowser']);
-		oSFBInjector = angular.element(oSFB).injector();
-		//
+		mSFB = angular.element(oSFB);
+		oSFBInjector = mSFB.injector();
 		////////////////////////////////////////////////////////
-		//
-		//var sfbscope = angular.element(mSFB).scope();
-		//console.log('sfbscope',sfbscope); // log
 		setTimeout(init,1000);
 	}
 
@@ -78,46 +94,17 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 	 */
 	function init(options) {
 		angular.module('sfbInstance',[])
-			.constant('SfbList',oSFBInjector.get('SfbList'))
+			.constant('SfbApi',oSFBInjector.get('SfbApi'))
 			.constant('$templateCache',oSFBInjector.get('$templateCache'))
-			.config(function($provide, $compileProvider, $filterProvider) {
-				//$provide.value('layout', 'list');
+			.constant('key',oSFBInjector.get('key'))
+			.config(function($provide) {
 				angular.forEach(angular.extend({
 					directory:''
 					,callback: function(files){console.log(files)}
 				},options),function(value,key) {
-//					this.push(key + ': ' + value);
 					$provide.value(key,value);
-//					.constant('SfbList',oSFBInjector.get('SfbList'))
 				});
 			})
-//			.config(['$provide', function($provide){
-//				$provide.decorator('$rootScope', ['$delegate', function($delegate){
-//					Object.defineProperty($delegate.constructor.prototype, '$onRootScope', {
-//						value: function(name, listener){
-//							var unsubscribe = $delegate.$on(name, listener);
-//							this.$on('$destroy', unsubscribe);
-//						},
-//						enumerable: false
-//					});
-//					return $delegate;
-//				}]);
-//			}])
-//			.run(function($injector,templates){
-//          		$injector.get('$compile')(templates);
-//			})
-//			.factory('mySharedService', function($rootScope) {
-//				var sharedService = {};
-//				sharedService.message = '';
-//				sharedService.prepForBroadcast = function (msg) {
-//					this.message = msg;
-//					this.broadcastItem();
-//				};
-//				sharedService.broadcastItem = function () {
-//					$rootScope.$broadcast('handleBroadcast');
-//				};
-//				return sharedService;
-//			})
 			.controller('sfbWindowController',function($scope,$rootScope,$element) {
 				$scope.menuMain = 'menuMain.html';
 				$scope.fileTable = 'fileTable.html';
@@ -126,7 +113,7 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 				$scope.y = 100;
 				$scope.xMax = 300;
 				$scope.yMax = 300;
-				$scope.w = 300;
+				$scope.w = 600;
 				$scope.h = 300;
 				$scope.sw = 300;
 				$scope.sh = 300;
@@ -274,12 +261,13 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 						,iOffsetX
 						,iOffsetY
 						,sEmit = attrs.draggable
-						,oBodyClass = document.body.classList
+						,mBody = document.body
+						,oBodyClass = mBody.classList
 					;
 					mElement.addEventListener('mousedown',handleElementMouseDown,false);
 					function handleElementMouseDown(e){
-						iOffsetX = e.offsetX;
-						iOffsetY = e.offsetY;
+						iOffsetX = e.offsetX-mBody.scrollLeft;
+						iOffsetY = e.offsetY-mBody.scrollTop;
 						document.addEventListener('mousemove',handleDocumentMouseMove,false);
 						document.addEventListener('mouseup',handleDocumentMouseUp,false);
 						oBodyClass.add('userSelectNone');
@@ -296,7 +284,6 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 						$rootScope.$emit(sEmit,e.pageX-iOffsetX,e.pageY-iOffsetY);
 					}
 				}
-
 				return {
 					link: link
 					,restrict: 'A'
@@ -307,17 +294,44 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 					$rootScope.$emit('view');
 				};
 			})
-			.controller('sfbFileTableController',function($scope,SfbList,callback) {
-				$scope.files = SfbList.query();
-				var unWatchFiles = $scope.$watch('files', function(){
-					setTimeout(function(){$scope.$apply()},40); // yeah that's ugly but view won't render initially
-					unWatchFiles();
-				});
+			.controller('sfbFileTableController',function($scope,SfbApi,$element,callback,key) {
+				$scope.files = SfbApi.query();
+				//var unWatchFiles = $scope.$watch('files', function(){
+				//	setTimeout(function(){$scope.$apply()},400); // yeah that's ugly but view won't render initially
+				//	unWatchFiles();
+				//});
 
-				$scope.select = function(file){
-					file.selected = !file.selected;
+				$scope.handleFileKeyUp = function(e){
+					if (e.keyCode===key.RETURN) {
+						renameFile(mInput);
+					}
 				};
-				$scope.choose = function(file){
+				var oFileLastClicked;
+				$scope.handleTrClick = function(e,file){
+					var mTarget = e.target;
+					checkEnabledInputs();
+					if (!key[key.CTRL]) clearSelected();
+					if (key[key.SHIFT]&&oFileLastClicked) {
+						console.log('shift'); // log
+						var iIndexCur = $scope.files.indexOf(file)
+							,iIndexLast = $scope.files.indexOf(oFileLastClicked)
+							,iMin = iIndexCur<iIndexLast?iIndexCur:iIndexLast
+							,iMax = iIndexCur>iIndexLast?iIndexCur:iIndexLast
+						;
+						for (var i=iMin;i<=iMax;i++) {
+							$scope.files[i].selected = true;
+						}
+					} else if (file.selected&&mTarget.nodeName==='INPUT') {
+						if (mTarget.getAttribute('disabled')!==null) {
+							mTarget.removeAttribute('disabled');
+						}
+					} else {
+						file.selected = !file.selected;
+						if (!file.selected) oFileLastClicked = null;
+					}
+					oFileLastClicked = file;
+				};
+				$scope.handleTrDblClick = function(file){
 					file.selected = true;
 					var aSelected = [];
 					$scope.files.forEach(function(file){
@@ -327,10 +341,78 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 					});
 					callback(aSelected);
 				};
+				$scope.fileDimensions = function(file){
+					return file.width&&file.height?(file.width+' x '+file.height):'';
+				};
+				$scope.formatSize = function(file){
+					return formatSize(file.size);
+				};
+				$scope.theadSize = function(e){
+					console.log('theadSize'); // log
+					var el = e.currentTarget
+						,$el = angular.element(el);
+					$el.css({width:'50px'});
+				};
+				/**
+				 * Calculate icon offset
+				 * @param file
+				 * @returns {string}
+				 */
+				$scope.icon = function(file){ // todo: check http://www.mailbigfile.com/101-most-popular-file-types/
+					var iHo = file.ext.charCodeAt(0)-97;
+					var iVo = file.ext.charCodeAt(1)-97;
+					switch (file.ext) {
+						case 'folder':		iHo = 26;	iVo = 2; break;
+						case 'folderup':	iHo = 28;	iVo = 2; break;
+						case 'odg':	iHo = 26; break;
+						case 'ods':	iHo = 27; break;
+						case 'odp':	iHo = 28; break;
+					}
+					iHo *= -16;
+					iVo *= -16;
+					// file td
+					return 'background-position:'+iHo+'px '+iVo+'px;';
+				};
+//				console.log('formatSize(234)',formatSize(2234)); // log
+//				function bapo(file){
+//				}
+				/**
+				 * Formats a number to the appropriate filesize notation
+				 * @name iddqd.internal.native.number.formatSize
+				 * @method
+				 * @param {number} int The number to round
+				 * @param {number} round The number of decimals to round by
+				 * @returns {string} Filesize string result
+				 */
+				function formatSize(int,round) {
+					var i, size = int;
+					if (round===undefined) round = 0;
+					var aSizes = ['B','kB','MB','GB','TB','PB','EB','ZB','YB'];
+					for (i = 0; size>1024 && (aSizes.length>=(i + 2)); i++) size /= 1024;
+					var iMult = Math.pow(10,round);
+					return (Math.round(size * iMult) / iMult) + aSizes[i];
+				}
+				function checkEnabledInputs(){
+					var aInputs = $element[0].querySelectorAll('tbody input');
+					for (var i=0,l=aInputs.length;i<l;i++){
+						renameFile(aInputs[i]);
+					}
+				}
+				function clearSelected(){
+					var aFiles = $scope.files;
+					for (var i=0,l=aFiles.length;i<l;i++){
+						aFiles[i].selected = false;
+					}
+				}
+				function renameFile(inputElement){
+					if (inputElement.getAttribute('disabled')===null) {
+						inputElement.setAttribute('disabled','disabled');
+						// todo: server call
+					}
+				}
 			})
 		;
         angular.bootstrap(oSFBInjector.get('createSfbElement')(), ['sfbInstance']);
-        //angular.bootstrap(oSFBInjector.get('createSfbElement')(), ['sfbInstance']);
 	}
 
 	/////////////////////////////////////////////////////////

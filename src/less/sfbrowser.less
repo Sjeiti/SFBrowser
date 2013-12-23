@@ -21,6 +21,9 @@
 			outline-color: tranparent;
 		}
 	}
+	.select {
+		.rb(9,9);
+	}
 }
 .userSelectNone {
 	.user-select(none);
@@ -38,8 +41,8 @@
 		padding: 10px;
 		.border-radius(4);
 		background: fade(#f0f0f0,95%);
-		@colorBg: fade(black,30%);
-		.box-shadow(~'1px 1px 8px @{colorBg}, 1px 1px 16px white inset');
+		@colorBg: fade(black,50%);
+		.box-shadow(~'1px 1px 16px @{colorBg}, 1px 1px 16px white inset');
 	}
 	h3 {
 		.lt(50%);
