@@ -40,7 +40,9 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 				});
 			})
 			.factory('key',function($document) {
-				var key = angular.extend({
+				var aUp = []
+					,aDown = []
+					,key = angular.extend({
 					ESC:	27
 					,F2:	113
 					,HOME:	36
@@ -54,24 +56,45 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 					,RIGHT:	39
 					,DOWN:	40
 					,keyUp: function(callback){
-
+						aUp.push(callback);
+					}
+					,keyDown: function(callback){
+						aDown.push(callback);
 					}
 				},[]);
 				$document.on('keydown',function(e){
 					key[e.keyCode] = true;
-
-					//console.log('keydown',e.keyCode); // log
+					aDown.map(function(fn){fn(e.keyCode)});
 				});
 				$document.on('keyup',function(e){
 					key[e.keyCode] = false;
+					aUp.map(function(fn){fn(e.keyCode)});
 				});
 				return key;
 			})
 			.factory('SfbApi',function($resource) {
-				return $resource(sUriAPI+'/list/:folder',{},{
-					query: {method: 'POST', params:{folder:encodeURIComponent('../../data')}, isArray: true}
-				});
+				return $resource(
+					sUriAPI+'/list/:base:folder'
+					,{}
+					,{
+						list: {
+							method: 'POST'
+							, params:{
+								base:encodeURIComponent('../../data/')
+								,folder:'@folder'
+							}
+							, isArray: false
+						}
+					}
+				);
 			})
+//			services.factory('Api',['$resource',function ($resource) {
+//				return {
+//					Recipe: $resource('/recipes/:id',{id: '@id'}),
+//					Users: $resource('/users/:id',{id: '@id'}),
+//					Group: $resource('/groups/:id',{id: '@id'})
+//				};
+//			}]);
 			.factory('createSfbElement',function($templateCache) {
 				return function(){
 					var mElement = angular.element($templateCache.get('sfbrowser.html'))[0]
@@ -124,75 +147,38 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 
 				handleWindowResize();
 				window.addEventListener('resize',handleWindowResize,false);
-//				$scope.$on('view', function(){
-//					console.log('foo',arguments);
-//				});
-//				$scope.$onRootScope('view', function(){
-//					console.log('foo');
-//				});
-//				$rootscope.$on('view',function(){
-//					console.log('view',arguments); // log
-//				});
+
+
+				$scope.fullscreen = function(){
+					$scope.x = 0;
+					$scope.y = 0;
+					$scope.w = $scope.sw;
+					$scope.h = $scope.sh;
+				};
+				$scope.close = function(){
+					$rootScope.$emit('close');
+				};
+
+
 				$rootScope.$on('view',function(){
 					$scope.layout = $scope.layout==='grid'?'list':'grid';
 				});
+				$rootScope.$on('close',function(){
+					$element.remove();
+				});
 
-//				// move
-//				$rootScope.$on('move',function($targetScope,x,y){
-//					moveX(x);
-//					moveY(y);
-//					$scope.$apply();
-//				});
-//				// resize
-//				$rootScope.$on('resize-l',function($targetScope,x){
-//					resizeXW(x);
-//					$scope.$apply();
-//				});
-//				$rootScope.$on('resize-r',function($targetScope,x){
-//					resizeW(x);
-//					$scope.$apply();
-//				});
-//				$rootScope.$on('resize-t',function($targetScope,x,y){
-//					resizeYH(y);
-//					$scope.$apply();
-//				});
-//				$rootScope.$on('resize-b',function($targetScope,x,y){
-//					resizeH(y);
-//					$scope.$apply();
-//				});
-//				$rootScope.$on('resize-tl',function($targetScope,x,y){
-//					resizeXW(x);
-//					resizeYH(y);
-//					$scope.$apply();
-//				});
-//				$rootScope.$on('resize-tr',function($targetScope,x,y){
-//					resizeW(x);
-//					resizeYH(y);
-//					$scope.$apply();
-//				});
-//				$rootScope.$on('resize-br',function($targetScope,x,y){
-//					resizeW(x);
-//					resizeH(y);
-//					$scope.$apply();
-//				});
-//				$rootScope.$on('resize-bl',function($targetScope,x,y){
-//					resizeXW(x);
-//					resizeH(y);
-//					$scope.$apply();
-//				});
 				'move resize-l resize-r resize-t resize-b resize-tl resize-tr resize-br resize-bl'.split(' ').forEach(function(s){
 					$rootScope.$on(s,function($targetScope,x,y){
-						var sName = $targetScope.name.split('-').pop();
-						switch (sName) {
+						switch (s) {
 							case 'move':	moveXY(x,y); break;
-							case 't':		resizeYH(y); break;
-							case 'tr':		resizeYH(y);
-							case 'r':		resizeW(x); break;
-							case 'bl':		resizeXW(x);
-							case 'b':		resizeH(y); break;
-							case 'tl':		resizeYH(y);
-							case 'l':		resizeXW(x); break;
-							case 'br':
+							case 'resize-t':		resizeYH(y); break;
+							case 'resize-tr':		resizeYH(y);
+							case 'resize-r':		resizeW(x); break;
+							case 'resize-bl':		resizeXW(x);
+							case 'resize-b':		resizeH(y); break;
+							case 'resize-tl':		resizeYH(y);
+							case 'resize-l':		resizeXW(x); break;
+							case 'resize-br':
 								resizeW(x);
 								resizeH(y);
 						}
@@ -238,22 +224,6 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 				function setMaxY(){
 					$scope.yMax = $scope.sh-$scope.h;
 				}
-
-				$scope.fullscreen = function(){
-					$scope.x = 0;
-					$scope.y = 0;
-					$scope.w = $scope.sw;
-					$scope.h = $scope.sh;
-				};
-				$scope.close = function(){
-					$element.remove();
-				};
-
-//				var unWatchX = $scope.$watch('x', function(newVal, oldVal) {
-//					console.log('x x'); // log
-//					$scope.$apply();
-//					unWatchX();
-//				});
 			})
 			.directive('draggable', function($rootScope) {
 				function link(scope, element, attrs) {
@@ -270,12 +240,12 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 						iOffsetY = e.offsetY-mBody.scrollTop;
 						document.addEventListener('mousemove',handleDocumentMouseMove,false);
 						document.addEventListener('mouseup',handleDocumentMouseUp,false);
-						oBodyClass.add('userSelectNone');
+//						oBodyClass.add('userSelectNone');
 					}
 					function handleDocumentMouseUp(){
 						document.removeEventListener('mousemove',handleDocumentMouseMove);
 						document.removeEventListener('mousemove',handleDocumentMouseUp);
-						oBodyClass.remove('userSelectNone');
+//						oBodyClass.remove('userSelectNone');
 					}
 					function handleDocumentMouseMove(e){
 //						element.css({border:'1px solid red'});
@@ -284,29 +254,42 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 						$rootScope.$emit(sEmit,e.pageX-iOffsetX,e.pageY-iOffsetY);
 					}
 				}
-				return {
-					link: link
-					,restrict: 'A'
-				}
+				return { link: link };
 			})
 			.controller('sfbMenuController',function($scope,$rootScope) {
 				$scope.filesView = function(){
 					$rootScope.$emit('view');
 				};
 			})
-			.controller('sfbFileTableController',function($scope,SfbApi,$element,callback,key) {
-				$scope.files = SfbApi.query();
-				//var unWatchFiles = $scope.$watch('files', function(){
-				//	setTimeout(function(){$scope.$apply()},400); // yeah that's ugly but view won't render initially
-				//	unWatchFiles();
-				//});
+			.controller('sfbFileTableController',function($scope,$rootScope,SfbApi,$element,callback,key) {
+
+				var sCurrentFolder = '';
+				var oFileLastClicked;
+
+				setFolder();
+
+				key.keyUp(function(keyCode){
+					if (keyCode===key.RETURN) {
+						// todo: select file/folder and possibly close
+					} else if (keyCode===key.SPACE) {
+						// todo: highlight file/folder
+					} else if (keyCode===key.ESC) {
+						console.log('escape pressed'); // log
+						$rootScope.$emit('close');
+					} else {
+
+					}
+				});
+
+				$rootScope.$on('move-files',function ($targetScope,x,y) {
+					console.log('move-files',$targetScope,x,y); // log
+				});
 
 				$scope.handleFileKeyUp = function(e){
 					if (e.keyCode===key.RETURN) {
 						renameFile(mInput);
 					}
 				};
-				var oFileLastClicked;
 				$scope.handleTrClick = function(e,file){
 					var mTarget = e.target;
 					checkEnabledInputs();
@@ -333,13 +316,17 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 				};
 				$scope.handleTrDblClick = function(file){
 					file.selected = true;
-					var aSelected = [];
-					$scope.files.forEach(function(file){
-						if (file.selected) {
-							aSelected.push(file);
-						}
-					});
-					callback(aSelected);
+					if (file.type==='dir') {
+						setFolder(file.name);
+					} else {
+						var aSelected = [];
+						$scope.files.forEach(function(file){
+							if (file.selected) {
+								aSelected.push(file);
+							}
+						});
+						callback(aSelected);
+					}
 				};
 				$scope.fileDimensions = function(file){
 					return file.width&&file.height?(file.width+' x '+file.height):'';
@@ -352,6 +339,10 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 					var el = e.currentTarget
 						,$el = angular.element(el);
 					$el.css({width:'50px'});
+					//
+					$scope.files.sort(function(a,b){
+						return a.name>b.name?1:0;
+					});
 				};
 				/**
 				 * Calculate icon offset
@@ -361,9 +352,11 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 				$scope.icon = function(file){ // todo: check http://www.mailbigfile.com/101-most-popular-file-types/
 					var iHo = file.ext.charCodeAt(0)-97;
 					var iVo = file.ext.charCodeAt(1)-97;
-					switch (file.ext) {
-						case 'folder':		iHo = 26;	iVo = 2; break;
+					switch (file.type) {
+						case 'dir':		iHo = 26;	iVo = 2; break;
 						case 'folderup':	iHo = 28;	iVo = 2; break;
+					}
+					switch (file.ext) {
 						case 'odg':	iHo = 26; break;
 						case 'ods':	iHo = 27; break;
 						case 'odp':	iHo = 28; break;
@@ -373,9 +366,6 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 					// file td
 					return 'background-position:'+iHo+'px '+iVo+'px;';
 				};
-//				console.log('formatSize(234)',formatSize(2234)); // log
-//				function bapo(file){
-//				}
 				/**
 				 * Formats a number to the appropriate filesize notation
 				 * @name iddqd.internal.native.number.formatSize
@@ -409,6 +399,18 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 						inputElement.setAttribute('disabled','disabled');
 						// todo: server call
 					}
+				}
+				function setFolder(folder){
+					var sNewFolder = sCurrentFolder+'/'+(folder||'');
+					SfbApi.list({folder:encodeURIComponent(sNewFolder)}).$promise.then(function(result){
+						if (result.success) {
+							sCurrentFolder = sNewFolder;
+							$scope.files = result.data;
+							$scope.$apply();
+						} else {
+							// todo: handle error
+						}
+					});
 				}
 			})
 		;

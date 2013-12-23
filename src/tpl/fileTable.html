@@ -14,6 +14,7 @@
 			data-ng-click="handleTrClick($event,file)"
 			data-ng-dblclick="handleTrDblClick(file)"
 			data-ng-repeat="file in files"
+			draggable="move-files"
 			class="{{file.selected?'selected':''}}"
 		>
 			<td style="{{icon(file)}}"><input type="text"
@@ -22,7 +23,7 @@
 				disabled
 			/></td>
 			<td>{{file.ext}}</td>
-			<td data-time="{{file.time}}">{{file.time*1000|date:'yyyy-MM-dd'}}</td>
+			<td>{{file.time*1000|date:'yyyy-MM-dd'}}</td>
 			<td>{{formatSize(file)}}</td>
 			<td>{{fileDimensions(file)}}</td>
 		</tr>
