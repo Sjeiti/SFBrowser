@@ -4,15 +4,15 @@ angular.module('sfbInstance').controller('SfbWindowCtrl',function($scope,$rootSc
 		,yMax = 300
 		,sw = 300
 		,sh = 300
-		,iX = 100
+		,iX = 10
 		,iY = 100
-		,iW = 600
+		,iW = 500
 		,iH = 300
 		,bFullScreen = false
-		,iLastX = 100
-		,iLastY = 100
-		,iLastW = 600
-		,iLastH = 300;
+		,iLastX
+		,iLastY
+		,iLastW
+		,iLastH;
 
 	handleWindowResize();
 	setWindowPos();

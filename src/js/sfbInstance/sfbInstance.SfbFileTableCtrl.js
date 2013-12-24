@@ -42,7 +42,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 			for (var i=iMin;i<=iMax;i++) {
 				$scope.files[i].selected = true;
 			}
-		} else if (file.selected&&mTarget.nodeName==='INPUT') {
+		} else if (file.selected&&file.name!=='..'&&mTarget.nodeName==='INPUT') {
 			if (mTarget.getAttribute('disabled')!==null) {
 				mTarget.removeAttribute('disabled');
 			}
@@ -87,7 +87,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		return file.width&&file.height?(file.width+' x '+file.height):'';
 	};
 	$scope.formatSize = function(file){
-		return formatSize(file.size);
+		return file.type!=='dir'?formatSize(file.size):'';
 	};
 	$scope.theadSize = function(e){
 		console.log('theadSize'); // log
@@ -95,9 +95,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 			,$el = angular.element(el);
 		$el.css({width:'50px'});
 		//
-		$scope.files.sort(function(a,b){
-			return a.name>b.name?1:0;
-		});
+		sortFiles();
 	};
 	/**
 	 * Calculate icon offset
@@ -181,9 +179,23 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 					file.originalName = file.name;
 				});
 				$scope.files = result.data;
+				sortFiles();
 				$scope.$apply();
 			} else {
 				console.log('result.error',result.error); // todo: handle error
+			}
+		});
+	}
+	function sortFiles(){
+		$scope.files.sort(function(a,b){
+			if ((a.type==='dir'&&b.type!=='dir')||a.name==='..') {
+				return -1;
+			} if ((a.type!=='dir'&&b.type==='dir')||b.name==='..') {
+				return 1;
+			} else {
+				if (a.name > b.name) return -1;
+				if (a.name < b.name) return 1;
+				return 0;
 			}
 		});
 	}
