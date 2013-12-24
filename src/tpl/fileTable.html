@@ -1,5 +1,5 @@
-<div class="sfb-filetable">
-	<table data-ng-controller="sfbFileTableController">
+<div class="sfb-filetable" data-ng-controller="sfbFileTableController">
+	<table>
 		<thead>
 		<tr>
 			<th data-ng-click="theadSize($event)">name</th>
@@ -10,26 +10,30 @@
 			<th></th>
 		</tr>
 		</thead>
-		<tbody>
-		<tr
-			data-ng-click="handleTrClick($event,file)"
-			data-ng-dblclick="handleTrDblClick(file)"
-			data-ng-repeat="file in files"
-			data-ng-model="file"
-			draggable="move-files"
-			class="{{file.selected?'selected':''}}"
-		>
-			<td style="{{icon(file)}}"><input type="text"
-				data-ng-keyup="handleFileKeyUp($event)"
-				data-ng-model="file.name"
-				disabled
-			/></td>
-			<td>{{file.ext}}</td>
-			<td>{{file.time*1000|date:'yyyy-MM-dd'}}</td>
-			<td>{{formatSize(file)}}</td>
-			<td>{{fileDimensions(file)}}</td>
-			<td><button data-ng-click="deleteFile(file)">del</button></td>
-		</tr>
-		</tbody>
 	</table>
+	<div class="scroll">
+		<table>
+			<tbody>
+			<tr
+				data-ng-click="handleTrClick($event,file)"
+				data-ng-dblclick="handleTrDblClick(file)"
+				data-ng-repeat="file in files"
+				data-ng-model="file"
+				draggable="move-files"
+				class="{{file.selected?'selected':''}}"
+			>
+				<td style="{{icon(file)}}"><input type="text"
+					data-ng-keyup="handleFileKeyUp($event)"
+					data-ng-model="file.name"
+					disabled
+				/></td>
+				<td>{{file.ext}}</td>
+				<td>{{file.time*1000|date:'yyyy-MM-dd'}}</td>
+				<td>{{formatSize(file)}}</td>
+				<td>{{fileDimensions(file)}}</td>
+				<td><button data-ng-click="deleteFile(file)">del</button></td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
 </div>

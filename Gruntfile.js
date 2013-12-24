@@ -84,14 +84,6 @@ module.exports = function (grunt) {
 						,dest: 'dist/'
 						,filter: 'isFile'
 					},
-					{ // connector api
-						expand: true
-						,dot: true
-						,cwd: 'src/connector/'
-						,src: ['**']
-						,dest: 'dist/connector/'
-						,filter: 'isFile'
-					},
 					{ // fonts
 						expand: true
 						,cwd: 'src/fonts/'
@@ -105,15 +97,6 @@ module.exports = function (grunt) {
 						,src: ['**']
 						,dest: 'dist/js/vendor/'
 						,filter: 'isFile'
-					},
-					{ // css
-						expand: true
-						,cwd: 'src/less/'
-						,src: ['**']
-						,dest: 'dist/css/'
-						,filter: function(src){
-							return src.indexOf('sfbrowser.css')!==-1||['less','css','bootstrap'].indexOf(src.split('.').pop())===-1;
-						}
 					}
 				]
 			}
@@ -126,6 +109,19 @@ module.exports = function (grunt) {
 						,src: ['**']
 						,dest: 'dist/connector/'
 						,filter: 'isFile'
+					}
+				]
+			}
+			,css: {
+				files: [
+					{
+						expand: true
+						,cwd: 'src/less/'
+						,src: ['**']
+						,dest: 'dist/css/'
+						,filter: function(src){
+							return src.indexOf('sfbrowser.css')!==-1||['less','css','bootstrap'].indexOf(src.split('.').pop())===-1;
+						}
 					}
 				]
 			}
@@ -237,6 +233,8 @@ module.exports = function (grunt) {
 	grunt.registerTask('dist',[
 		'clean:dist'
 		,'copy:dist'
+		,'copy:connector'
+		,'copy:css'
 		,'includejs:temp'
 		,'copy:temp'
 		,'wrapconcat:dist'

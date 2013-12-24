@@ -1,6 +1,8 @@
 angular.module('sfbInstance').controller('SfbWindowCtrl',function($scope,$rootScope,$element) {
 	'use strict';
-	var xMax = 300
+	var mElement = $element[0]
+		,oStyle = mElement.style
+		,xMax = 300
 		,yMax = 300
 		,sw = 300
 		,sh = 300
@@ -16,6 +18,10 @@ angular.module('sfbInstance').controller('SfbWindowCtrl',function($scope,$rootSc
 
 	handleWindowResize();
 	setWindowPos();
+	setTimeout(function(){
+		$rootScope.$emit('heightChanged',mElement.offsetHeight);
+		$rootScope.$emit('widthChanged',mElement.offsetWidth);
+	},40);
 	window.addEventListener('resize',handleWindowResize,false);
 
 	$rootScope.$on('fullscreen',function(){
@@ -60,12 +66,20 @@ angular.module('sfbInstance').controller('SfbWindowCtrl',function($scope,$rootSc
 		});
 	});
 	function setWindowPos(){
-		$element.css({
-			left: iX+'px'
-			,top: iY+'px'
-			,width: iW+'px'
-			,height: iH+'px'
-		});
+		if (mElement.offsetHeight!==iH) {
+			oStyle.height = iH+'px';
+			$rootScope.$emit('heightChanged',mElement.offsetHeight);
+		}
+		if (mElement.offsetWidth!==iW) {
+			oStyle.width = iW+'px';
+			$rootScope.$emit('widthChanged',mElement.offsetWidth);
+		}
+		if (mElement.offsetLeft!==iX) {
+			oStyle.left = iX+'px';
+		}
+		if (mElement.offsetTop!==iX) {
+			oStyle.top = iY+'px';
+		}
 	}
 	function moveXY(x,y){
 		iX = Math.min(Math.max(x,0),xMax);

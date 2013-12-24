@@ -114,7 +114,7 @@ new SfBrowser();
 		//   }
 		//   return (false); // no match at all
 		//}
-		//	function fileInfo($sFile) { // todo: check wp_ext2type
+		//	function fileInfo($sFile) {
 		//		$aRtr = array();
 		//		$aRtr["type"] = filetype($sFile);
 		//		$sFileName = array_pop(preg_split("/\//",$sFile));

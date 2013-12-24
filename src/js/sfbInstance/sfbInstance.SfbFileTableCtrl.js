@@ -1,7 +1,13 @@
 angular.module('sfbInstance').controller('sfbFileTableController',function($scope,$rootScope,Api,$element,callback,Key) {
 	'use strict';
-	var sCurrentFolder = ''
-		,oFileLastClicked;
+	var mElement = $element[0]
+		,mScroll = mElement.querySelector('.scroll')
+		,aTables = mElement.querySelectorAll('table')
+		,aHeadTd = aTables[0].querySelector('tr').children
+		,aBodyTd
+		,sCurrentFolder = ''
+		,oFileLastClicked
+	;
 
 	setFolder();
 
@@ -97,6 +103,15 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		//
 		sortFiles();
 	};
+	$rootScope.$on('heightChanged',function($targetScope,h) {
+		mScroll.style.height = (h-85)+'px';
+	});
+	$rootScope.$on('widthChanged',setTableHeadSize);
+	/*'resize-t resize-b resize-tl resize-tr resize-br resize-bl'.split(' ').forEach(function(s){
+		$rootScope.$on(s,function($targetScope,x,y){
+
+		});
+	});*/
 	/**
 	 * Calculate icon offset
 	 * @param file
@@ -136,7 +151,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		return (Math.round(size * iMult) / iMult) + aSizes[i];
 	}
 	function checkEnabledInputs(){
-		var aInputs = $element[0].querySelectorAll('tbody input');
+		var aInputs = mElement.querySelectorAll('tbody input');
 		for (var i=0,l=aInputs.length;i<l;i++){
 			renameFile(aInputs[i]);
 		}
@@ -181,6 +196,8 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 				$scope.files = result.data;
 				sortFiles();
 				$scope.$apply();
+				aBodyTd = aTables[1].querySelector('tr').children;
+				setTableHeadSize();
 			} else {
 				console.log('result.error',result.error); // todo: handle error
 			}
@@ -198,6 +215,13 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 				return 0;
 			}
 		});
+	}
+	function setTableHeadSize(){
+		if (aBodyTd) {
+			for (var i=0,l=aBodyTd.length-1;i<l;i++) {
+				aHeadTd[i].style.width = aBodyTd[i].offsetWidth+'px';
+			}
+		}
 	}
 });
 //angular.module('sfbInstance').directive('ng-file', function() {

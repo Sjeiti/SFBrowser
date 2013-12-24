@@ -1,4 +1,5 @@
 angular.module('sfbrowser').factory('Key',function($document){
+	'use strict';
 	var aUp = []
 		,aDown = []
 		,key = angular.extend({
@@ -23,11 +24,11 @@ angular.module('sfbrowser').factory('Key',function($document){
 	},[]);
 	$document.on('keydown',function(e){
 		key[e.keyCode] = true;
-		aDown.map(function(fn){fn(e.keyCode)});
+		aDown.map(function(fn){fn(e.keyCode);});
 	});
 	$document.on('keyup',function(e){
 		key[e.keyCode] = false;
-		aUp.map(function(fn){fn(e.keyCode)});
+		aUp.map(function(fn){fn(e.keyCode);});
 	});
 	return key;
 });
