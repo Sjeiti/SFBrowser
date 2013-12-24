@@ -98,6 +98,17 @@ module.exports = function (grunt) {
 					}
 				]
 			}
+			,temp: {
+				files: [
+					{
+						expand: true
+						,cwd: 'temp/'
+						,src: 'sfbrowser.js'
+						,dest: 'dist/js/'
+						,filter: 'isFile'
+					}
+				]
+			}
 		},
 
 		wrapconcat: {
@@ -116,7 +127,75 @@ module.exports = function (grunt) {
 				src: aFiles,
 				dest: 'dist/js/sfbrowser.min.js'
 			}
+		},
+
+
+		/*transpile: {
+			main: {
+				type: "yui", // or "amd" or "yui"
+				files: [
+					{
+						expand: true,
+						cwd: 'src/js/',
+						src: ['foo.js'],
+						dest: 'temp'
+					}
+				]
+			}
+		},
+
+		includereplace: {
+			main: {
+				options: {
+					// Task-specific options go here.
+				},
+				// Files to perform replacements and includes with
+				//cwd: 'src/js/',
+				src: 'src/js/foo.js',
+				// Destination directory to copy files to
+				dest: 'temp/foo.js'
+			}
+		}*/
+
+
+		includejs: {
+			temp: {
+				cwd: 'src/js/',
+				src: ['sfbrowser.js'],
+				dest: 'temp/'
+			}
 		}
+
+	});
+
+	grunt.registerMultiTask('includejs', '', function() {
+		//var oOptions = this.options({});
+		var aFiles = []
+			,sCwd = this.data.cwd
+			,sDest = this.data.dest
+			,iNumFiles = 0;
+		this.data.src.forEach(function(src){
+			console.log('including ',sCwd+src); // log
+			fs.writeFileSync(sDest+src,includeInto(sCwd+src));
+		});
+		function includeInto(file){
+			iNumFiles++;
+			var sFileContents = fs.readFileSync(file).toString()
+				,aMatch = sFileContents.match(/\/\*\s?include\s+.*\s?\*\//g);
+			if (aMatch) {
+				aMatch.forEach(function(include){
+					var sFile = include.match(/(\/\*\s?include\s+)(.*)(\s?\*\/)/)[2]
+						,aSplit = file.split('/')
+						,sPath;
+					aSplit.pop();
+					sPath = aSplit.join('/')+'/';
+					console.log('including ',sPath+sFile); // log
+					sFileContents = sFileContents.replace(include,includeInto(sPath+sFile));
+				});
+			}
+			return sFileContents;
+		}
+		grunt.log.writeln(iNumFiles+' files processed.');
 	});
 
 	grunt.registerMultiTask('wrapconcat', '', function() {
@@ -139,8 +218,11 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-es6-module-transpiler');
+	grunt.loadNpmTasks('grunt-include-replace');
 
 	grunt.registerTask('default',['jshint','uglify']);
+	grunt.registerTask('dev',['includejs:temp','copy:temp']);
 	grunt.registerTask('dist',['copy:dist','wrapconcat:dist','uglify:dist']);
 
 };

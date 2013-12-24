@@ -1,6 +1,6 @@
 {
     "globals": {
-//		"iddqd": true,
+		"angular": true
 //		"require": true,
 //		"exports": true,
 //		"signals": true
