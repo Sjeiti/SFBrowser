@@ -68,21 +68,63 @@ module.exports = function (grunt) {
 			files: aFiles
 		},
 
+		clean: {
+			dist: {
+				src: ['dist/**']
+			}
+		},
+
 		copy: {
 			dist: {
 				files: [
-					{
+					{ // index.html and test data/
+						expand: true
+						,cwd: 'dist_files/'
+						,src: ['**']
+						,dest: 'dist/'
+						,filter: 'isFile'
+					},
+					{ // connector api
+						expand: true
+						,dot: true
+						,cwd: 'src/connector/'
+						,src: ['**']
+						,dest: 'dist/connector/'
+						,filter: 'isFile'
+					},
+					{ // fonts
 						expand: true
 						,cwd: 'src/fonts/'
 						,src: ['**']
 						,dest: 'dist/fonts/'
 						,filter: 'isFile'
 					},
+					{ // vendor js files
+						expand: true
+						,cwd: 'src/js/vendor/'
+						,src: ['**']
+						,dest: 'dist/js/vendor/'
+						,filter: 'isFile'
+					},
+					{ // css
+						expand: true
+						,cwd: 'src/less/'
+						,src: ['**']
+						,dest: 'dist/css/'
+						,filter: function(src){
+							return src.indexOf('sfbrowser.css')!==-1||['less','css','bootstrap'].indexOf(src.split('.').pop())===-1;
+						}
+					}
+				]
+			}
+			,connector: {
+				files: [
 					{
 						expand: true
-						,cwd: 'src/js/'
+						,dot: true
+						,cwd: 'src/connector/'
 						,src: ['**']
-						,dest: 'dist/js/'
+						,dest: 'dist/connector/'
 						,filter: 'isFile'
 					}
 				]
@@ -129,35 +171,6 @@ module.exports = function (grunt) {
 			}
 		},
 
-
-		/*transpile: {
-			main: {
-				type: "yui", // or "amd" or "yui"
-				files: [
-					{
-						expand: true,
-						cwd: 'src/js/',
-						src: ['foo.js'],
-						dest: 'temp'
-					}
-				]
-			}
-		},
-
-		includereplace: {
-			main: {
-				options: {
-					// Task-specific options go here.
-				},
-				// Files to perform replacements and includes with
-				//cwd: 'src/js/',
-				src: 'src/js/foo.js',
-				// Destination directory to copy files to
-				dest: 'temp/foo.js'
-			}
-		}*/
-
-
 		includejs: {
 			temp: {
 				cwd: 'src/js/',
@@ -170,8 +183,7 @@ module.exports = function (grunt) {
 
 	grunt.registerMultiTask('includejs', '', function() {
 		//var oOptions = this.options({});
-		var aFiles = []
-			,sCwd = this.data.cwd
+		var sCwd = this.data.cwd
 			,sDest = this.data.dest
 			,iNumFiles = 0;
 		this.data.src.forEach(function(src){
@@ -208,7 +220,7 @@ module.exports = function (grunt) {
 			});
 		});
 		aFiles.forEach(function(file){
-			var sFileName = file.split('/').pop()
+			var sFileName = file.split('/').pop();
 			sContents += oOptions.prefix.replace('%filename%',sFileName)+fs.readFileSync(file).toString().replace(/[\r\n\t]/g,' ').replace(/\s+/g,' ').replace(/>\s</g,'><')+oOptions.suffix;
 		});
 		fs.writeFileSync(this.data.dest,sContents);
@@ -218,11 +230,17 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-copy');
-	grunt.loadNpmTasks('grunt-es6-module-transpiler');
-	grunt.loadNpmTasks('grunt-include-replace');
+	grunt.loadNpmTasks('grunt-contrib-clean');
 
 	grunt.registerTask('default',['jshint','uglify']);
 	grunt.registerTask('dev',['includejs:temp','copy:temp']);
-	grunt.registerTask('dist',['copy:dist','wrapconcat:dist','uglify:dist']);
+	grunt.registerTask('dist',[
+		'clean:dist'
+		,'copy:dist'
+		,'includejs:temp'
+		,'copy:temp'
+		,'wrapconcat:dist'
+		,'uglify:dist'
+	]);
 
 };

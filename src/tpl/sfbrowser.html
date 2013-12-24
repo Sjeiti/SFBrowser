@@ -1,21 +1,15 @@
-<div class="sfb sfb-modal" data-ng-controller="SfbCtrl">
-	<div class="sfb-window sfb-{{layout}}"
-			style="
-				left:{{x}}px;
-				top:{{y}}px;
-				width:{{w}}px;
-				height:{{h}}px;
-			">
+<div class="sfb sfb-modal" data-ng-controller="SfbCtrl as sfb">
+	<div class="sfb-window sfb-{{sfb.layout}}" data-ng-controller="SfbWindowCtrl">
 		<h3>SFBrowser</h3>
 		<div class="sfb-window-buttons">
-			<button data-ng-click="fullscreen()" class="icon-expand"></button>
-			<button data-ng-click="close()"		 class="icon-close"></button>
+			<button data-ng-click="sfb.fullscreen()" class="icon-expand"></button>
+			<button data-ng-click="sfb.close()"		 class="icon-close"></button>
 		</div>
-		<ng-include src="menuMain"></ng-include>
-		<ng-include src="fileTable"></ng-include>
+		<ng-include src="sfb.menuMain"></ng-include>
+		<ng-include src="sfb.fileTable"></ng-include>
 		<div class="select">
-			<button type="button" class="btn btn-default btn-sm">Cancel</button>
-			<button type="button" class="btn btn-primary btn-sm">Select</button>
+			<button class="btn btn-default btn-sm">Cancel</button>
+			<button class="btn btn-primary btn-sm">Select</button>
 		</div>
 		<div class="sfb-move"		draggable="move"></div>
 		<div class="sfb-resize-l"	draggable="resize-l"></div>

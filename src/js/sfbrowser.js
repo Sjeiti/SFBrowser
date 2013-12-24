@@ -1,3 +1,4 @@
+/* global loadScripts */
 /**
  * @name sfbrowser
  * @version 4.0.64
@@ -5,14 +6,13 @@
  * @copyright Ron Valstar <ron@ronvalstar.nl>
  */
 if (window.sfbrowser===undefined) window.sfbrowser = (function () {
+	'use strict';
 	var sUriCDN = '//ajax.googleapis.com/ajax/libs/angularjs/1.2.5/'
 		,sUriAngularBaseCDN = sUriCDN+'angular.js'
 		,sUriAngularResourceCDN = sUriCDN+'angular-resource.js'
 		,sUriAngularBase = 'js/vendor/angular.js'
 		,sUriAngularResource = 'js/vendor/angular-resource.min.js'
 		,sUriCSS = 'css/sfbrowser.css'
-		,sUriTemplates = 'sfbrowser.html'
-		,sUriAPI = 'connector/php'
 		//
 		,oSFBInjector
 	;

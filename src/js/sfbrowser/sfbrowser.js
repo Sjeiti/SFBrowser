@@ -1,18 +1,12 @@
 angular.module('sfbrowser',['ngResource'])
-	.config(function($provide, $compileProvider, $filterProvider){
-	})
+	/*.config(function($provide, $compileProvider, $filterProvider){
+	})*/
 	.run(function($http,$injector){
-		$http.get(sUriTemplates).success(function(response){
+		'use strict';
+		$http.get('sfbrowser.html').success(function(response){
 			$injector.get('$compile')(response);
 		});
 	})
-//	services.factory('Api',['$resource',function ($resource) {
-//		return {
-//			Recipe: $resource('/recipes/:id',{id: '@id'}),
-//			Users: $resource('/users/:id',{id: '@id'}),
-//			Group: $resource('/groups/:id',{id: '@id'})
-//		};
-//	}]);
 //	.factory('createSfbElement',function($templateCache){
 //		return function(){
 //			var mElement = angular.element($templateCache.get('sfbrowser.html'))[0];

@@ -6,7 +6,9 @@ require 'Slim/Slim.php';
 define('ROOTFOLDER','C:\xampp\htdocs\sfbrowser\dist\data');
 //
 
-$app = new \Slim\Slim();
+$app = new \Slim\Slim(array(
+    'debug' => true
+));
 $app->get('.', function() {
     echo "Hello there.";
 });
@@ -15,11 +17,8 @@ $app->get('.', function() {
 //
 $app->post('/list/:folder', function($folder) {
 	$sDir = urldecode($folder);
-	$sRealDir = realpath($sDir);
 	$aResponse = array('success'=>false);
-	if (strpos($sRealDir,ROOTFOLDER)===false) {
-		$aResponse['error'] = 'invalid path: \''.$sDir.'\' not in \''.ROOTFOLDER.'';
-	} else {
+	if (checkPath($sDir)) {
 		$aFiles = array();
 		if ($handle = opendir($sDir)) while (false !== ($file = readdir($handle))) {
 			$oFNfo = fileInfo($sDir.'/'.$file);
@@ -27,9 +26,59 @@ $app->post('/list/:folder', function($folder) {
 		}
 		$aResponse['success'] = true;
 		$aResponse['data'] = $aFiles;
+	} else {
+		$aResponse['error'] = "Invalid path: '$sDir' not in '".ROOTFOLDER."'";
 	}
 	echo json_encode($aResponse);
 });
+
+
+$app->post('/delete/:file', function($file) {
+	$sFile = urldecode($file);
+	$aResponse = array('success'=>false);
+	if (checkPath($sFile)) {
+		if (file_exists($sFile)) {
+			if (unlink($sFile)) {
+				$aResponse['success'] = true;
+				$aResponse['data'] = $sFile;
+			} else {
+				$aResponse['error'] = "The file '$file' could not be deleted";
+			}
+		} else {
+			$aResponse['error'] = "The file '$file' does not exist";
+		}
+	} else {
+		$aResponse['error'] = "Invalid path: '$sFile' not in '".ROOTFOLDER."'";
+	}
+	echo json_encode($aResponse);
+});
+
+
+$app->post('/rename/:file/:to', function($file,$to) {
+	$sFile = urldecode($file);
+	$sFileTo = urldecode($to);
+	$aResponse = array('success'=>false);
+	if (checkPath($sFile)) {// &&checkPath($sFileTo,$aResponse) // todo: check path $sFileTo
+		if (file_exists($sFile)) {
+			if (rename($sFile,$sFileTo)) {
+				$aResponse['success'] = true;
+				$aResponse['data'] = $sFile.' => '.$sFileTo;
+			} else {
+				$aResponse['error'] = "The file '$file' could not be renamed";
+			}
+		} else {
+			$aResponse['error'] = "The file '$file' does not exist";
+		}
+	} else {
+		$aResponse['error'] = "Invalid path: '$sFile' not in '".ROOTFOLDER."'";
+	}
+	echo json_encode($aResponse);
+});
+
+function checkPath($path){ // todo: refactor
+	return strpos(realpath($path),ROOTFOLDER)!==false;
+}
+
 
 function fileInfo($sFile) {
 	$aRtr = array();

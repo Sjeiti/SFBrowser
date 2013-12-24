@@ -7,6 +7,7 @@
 			<th>date</th>
 			<th>size</th>
 			<th>dimensions</th>
+			<th></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -14,6 +15,7 @@
 			data-ng-click="handleTrClick($event,file)"
 			data-ng-dblclick="handleTrDblClick(file)"
 			data-ng-repeat="file in files"
+			data-ng-model="file"
 			draggable="move-files"
 			class="{{file.selected?'selected':''}}"
 		>
@@ -26,6 +28,7 @@
 			<td>{{file.time*1000|date:'yyyy-MM-dd'}}</td>
 			<td>{{formatSize(file)}}</td>
 			<td>{{fileDimensions(file)}}</td>
+			<td><button data-ng-click="deleteFile(file)">del</button></td>
 		</tr>
 		</tbody>
 	</table>

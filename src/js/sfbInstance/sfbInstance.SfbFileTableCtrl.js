@@ -1,7 +1,7 @@
 angular.module('sfbInstance').controller('sfbFileTableController',function($scope,$rootScope,Api,$element,callback,Key) {
-
-	var sCurrentFolder = '';
-	var oFileLastClicked;
+	'use strict';
+	var sCurrentFolder = ''
+		,oFileLastClicked;
 
 	setFolder();
 
@@ -24,15 +24,16 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 
 	$scope.handleFileKeyUp = function(e){
 		if (e.keyCode===Key.RETURN) {
-			renameFile(mInput);
+			renameFile(e.target);
 		}
 	};
 	$scope.handleTrClick = function(e,file){
-		var mTarget = e.target;
+		var mCurrentTarget = e.currentTarget
+			,mTarget = e.target;
+		console.log('handleTrClick',file.selected,mTarget.nodeName,mCurrentTarget.nodeName); // log
 		checkEnabledInputs();
-		if (!Key[Key.CTRL]) clearSelected();
+		if (!Key[Key.CTRL]) clearSelected(file);
 		if (Key[Key.SHIFT]&&oFileLastClicked) {
-			console.log('shift'); // log
 			var iIndexCur = $scope.files.indexOf(file)
 				,iIndexLast = $scope.files.indexOf(oFileLastClicked)
 				,iMin = iIndexCur<iIndexLast?iIndexCur:iIndexLast
@@ -63,6 +64,23 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 				}
 			});
 			callback(aSelected);
+		}
+	};
+	$scope.deleteFile = function(file){
+		if (file.type==='dir') {
+			console.log('todo rem dir'); // todo: rem dir
+		} else {
+			Api.delete({file:encodeURIComponent(sCurrentFolder+'/'+file.name)},function(result) {
+				if (result.success) {
+					var iIndex = $scope.files.indexOf(file);
+					if (iIndex!==-1) {
+						$scope.files.splice(iIndex,1);
+						$scope.$apply();
+					}
+				} else {
+					console.log('result.error',result.error);
+				}
+			});
 		}
 	};
 	$scope.fileDimensions = function(file){
@@ -125,28 +143,54 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 			renameFile(aInputs[i]);
 		}
 	}
-	function clearSelected(){
+	function clearSelected(except){
 		var aFiles = $scope.files;
 		for (var i=0,l=aFiles.length;i<l;i++){
-			aFiles[i].selected = false;
+			var file = aFiles[i];
+			if (file!==except) file.selected = false;
 		}
 	}
 	function renameFile(inputElement){
 		if (inputElement.getAttribute('disabled')===null) {
 			inputElement.setAttribute('disabled','disabled');
-			// todo: server call
+			var mTr = inputElement.parentNode.parentNode
+				,oModel = angular.element(mTr).controller('ngModel')
+				,oFile = oModel.$modelValue;
+			if (oFile.name!==oFile.originalName) {
+				Api.rename({
+					file:encodeURIComponent(sCurrentFolder+'/'+oFile.originalName)
+					,to:encodeURIComponent(sCurrentFolder+'/'+oFile.name)
+				},function(result) {
+					if (result.success) {
+						oFile.originalName = oFile.name;
+					} else {
+						oFile.name = oFile.originalName;
+						$scope.$apply();
+						console.log('result.error',result.error); // todo: handle error
+					}
+				});
+			}
 		}
 	}
 	function setFolder(folder){
 		var sNewFolder = sCurrentFolder+'/'+(folder||'');
-		Api.list({folder:encodeURIComponent(sNewFolder)}).$promise.then(function(result){
+		Api.list({folder:encodeURIComponent(sNewFolder)},function(result) {
 			if (result.success) {
 				sCurrentFolder = sNewFolder;
+				result.data.forEach(function(file){
+					file.originalName = file.name;
+				});
 				$scope.files = result.data;
 				$scope.$apply();
 			} else {
-				// todo: handle error
+				console.log('result.error',result.error); // todo: handle error
 			}
 		});
 	}
 });
+//angular.module('sfbInstance').directive('ng-file', function() {
+//	'use strict';
+//	function link(scope, element, attrs) {
+//	}
+//	return { link: link };
+//});

@@ -12,6 +12,7 @@ angular.module('sfbInstance',[])
 	})
 ;
 /*include sfbInstance.SfbCtrl.js*/
+/*include sfbInstance.SfbWindowCtrl.js*/
 /*include sfbInstance.SfbMenuCtrl.js*/
 /*include sfbInstance.SfbFileTableCtrl.js*/
 /*include sfbInstance.SfbDraggableDir.js*/
