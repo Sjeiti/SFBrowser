@@ -175,6 +175,16 @@ module.exports = function (grunt) {
 			}
 		}
 
+		,less: {
+			options: {
+				compress: true
+			}
+			,dev: {
+				src: ['src/less/sfbrowser.less'],
+				dest: 'dist/css/sfbrowser.css'
+			}
+		}
+
 	});
 
 	grunt.registerMultiTask('includejs', '', function() {
@@ -227,6 +237,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-clean');
+	grunt.loadNpmTasks('grunt-contrib-less');
 
 	grunt.registerTask('default',['jshint','uglify']);
 	grunt.registerTask('dev',['includejs:temp','copy:temp']);
