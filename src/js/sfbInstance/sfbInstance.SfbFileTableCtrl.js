@@ -180,6 +180,9 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 				sCurrentFolder = sNewFolder;
 				result.data.forEach(function(file){
 					file.originalName = file.name;
+					if (file.width&&file.height) {
+						file.surface = file.width*file.height;
+					}
 				});
 				$scope.files = result.data;
 				sortFiles();
@@ -194,6 +197,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 	function sortFiles(by,bDesc){
 		console.log('sortFiles',by); // log
 		if (by===undefined) by = 'name';
+		var iAscDesc = bDesc?-1:1;
 		$scope.files.sort(function(a,b){
 			if ((a.type==='dir'&&b.type!=='dir')||a.name==='..') {
 				return -1;
@@ -202,10 +206,12 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 			} else {
 				var sA = a[by]
 					,sB = b[by];
+				if (sA===undefined) return 1;
+				else if (sB===undefined) return -1;
 				if (sA&&sA.toLowerCase) sA = sA.toLowerCase();
 				if (sB&&sB.toLowerCase) sB = sB.toLowerCase();
-				if (sA>sB) return bDesc?1:-1;
-				if (sA<sB) return bDesc?-1:1;
+				if (sA>sB) return iAscDesc;
+				if (sA<sB) return -iAscDesc;
 				return 0;
 			}
 		});
