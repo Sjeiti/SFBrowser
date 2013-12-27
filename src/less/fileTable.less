@@ -35,14 +35,18 @@
 	}
 	th {
 		font: bold 10px / @theadHeight Arial,sans;
-		&.sortasc:after {
-			content: 'u';
-			padding-left: 5px;
+		@arrowSize: 4px;
+		&.sortasc:after, &.sortdesc:after {
+			content: '';
+			display: inline-block;
+			position: relative;
+			top: -1px;
+			margin-left: 3px;
+			border-right: @arrowSize solid transparent;
+			border-left: @arrowSize solid transparent;
 		}
-		&.sortdesc:after {
-			content: 'n';
-			padding-left: 5px;
-		}
+		&.sortasc:after { border-top: @arrowSize solid @colorSfb; }
+		&.sortdesc:after { border-bottom: @arrowSize solid @colorSfb; }
 	}
 	td {
 		font: 12px/16px Arial,sans;
