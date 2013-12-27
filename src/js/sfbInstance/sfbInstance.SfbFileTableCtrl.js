@@ -84,9 +84,21 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		return file.type!=='dir'?formatSize(file.size):'';
 	};
 	$scope.sortBy = function(e){
-		var mTarget = e.target
-			,sSortBy = mTarget.getAttribute('data-type');
-		if (sSortBy) sortFiles(sSortBy);
+		var mCTarget = e.currentTarget
+			,aTh = mCTarget.childNodes
+			,mTarget = e.target
+			,aTClassList = mTarget.classList
+			,bDesc = aTClassList.contains('sortasc')
+			,sSortBy = mTarget.getAttribute('data-type')
+		;
+		for (var i=0,l=aTh.length;i<l;i++) {
+			var mSibl = aTh[i];
+			mSibl.classList.remove('sortasc');
+			mSibl.classList.remove('sortdesc');
+		}
+		//console.log('mTarget.siblings',mTarget.siblings); // log
+		aTClassList.add(bDesc?'sortdesc':'sortasc');
+		if (sSortBy) sortFiles(sSortBy,bDesc);
 	};
 	/**
 	 * Calculate icon offset
@@ -179,7 +191,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 			}
 		});
 	}
-	function sortFiles(by){
+	function sortFiles(by,bDesc){
 		console.log('sortFiles',by); // log
 		if (by===undefined) by = 'name';
 		$scope.files.sort(function(a,b){
@@ -188,8 +200,12 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 			} if ((a.type!=='dir'&&b.type==='dir')||b.name==='..') {
 				return 1;
 			} else {
-				if (a[by]>b[by]) return -1;
-				if (a[by]<b[by]) return 1;
+				var sA = a[by]
+					,sB = b[by];
+				if (sA&&sA.toLowerCase) sA = sA.toLowerCase();
+				if (sB&&sB.toLowerCase) sB = sB.toLowerCase();
+				if (sA>sB) return bDesc?1:-1;
+				if (sA<sB) return bDesc?-1:1;
 				return 0;
 			}
 		});
