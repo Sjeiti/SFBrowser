@@ -3,19 +3,20 @@
 
 @import 'sfbFont';
 
+@colorSfb: #428BCA;//#526930;
+
 .sfb {
 	button[class^="icon-"] {
 		margin: 0;
 		padding: 0;
 		border: 0;
 		font-size: 16px;
-		color: #526930;
+		color: @colorSfb;
 		background-color: transparent;
 		&:hover {
-			color: #568B06;
+			color: lighten(@colorSfb,10%);
 		}
 		&:focus {
-//			.box-shadow(none);
 			outline-size: 0px;
 			outline-style: none;
 			outline-color: tranparent;

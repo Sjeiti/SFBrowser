@@ -1,12 +1,12 @@
 <div class="sfb-filetable" data-ng-controller="sfbFileTableController">
 	<table>
 		<thead>
-		<tr>
-			<th data-ng-click="theadSize($event)">name</th>
-			<th>type</th>
-			<th>date</th>
-			<th>size</th>
-			<th>dimensions</th>
+		<tr data-ng-click="sortBy($event)">
+			<th data-type="name">name</th>
+			<th data-type="type">type</th>
+			<th data-type="time">date</th>
+			<th data-type="size">size</th>
+			<th data-type="width">dimensions</th>
 			<th></th>
 		</tr>
 		</thead>

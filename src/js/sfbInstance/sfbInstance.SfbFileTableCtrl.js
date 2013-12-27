@@ -11,22 +11,10 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 
 	setFolder();
 
-	Key.keyUp(function(keyCode){
-		if (keyCode===Key.RETURN) {
-			// todo: select file/folder and possibly close
-		} else if (keyCode===Key.SPACE) {
-			// todo: highlight file/folder
-		} else if (keyCode===Key.ESC) {
-			console.log('escape pressed'); // log
-			$rootScope.$emit('close');
-		} else {
-
-		}
-	});
-
-	$rootScope.$on('move-files',function ($targetScope,x,y) {
-		console.log('move-files',$targetScope,x,y); // log
-	});
+	$rootScope.$on('heightChanged',handleHeightChanged);
+	$rootScope.$on('widthChanged',handleWidthChanged);
+	$rootScope.$on('move-files',handleMoveFiles);
+	Key.keyUp(handleKeyUp);
 
 	$scope.handleFileKeyUp = function(e){
 		if (e.keyCode===Key.RETURN) {
@@ -95,23 +83,11 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 	$scope.formatSize = function(file){
 		return file.type!=='dir'?formatSize(file.size):'';
 	};
-	$scope.theadSize = function(e){
-		console.log('theadSize'); // log
-		var el = e.currentTarget
-			,$el = angular.element(el);
-		$el.css({width:'50px'});
-		//
-		sortFiles();
+	$scope.sortBy = function(e){
+		var mTarget = e.target
+			,sSortBy = mTarget.getAttribute('data-type');
+		if (sSortBy) sortFiles(sSortBy);
 	};
-	$rootScope.$on('heightChanged',function($targetScope,h) {
-		mScroll.style.height = (h-85)+'px';
-	});
-	$rootScope.$on('widthChanged',setTableHeadSize);
-	/*'resize-t resize-b resize-tl resize-tr resize-br resize-bl'.split(' ').forEach(function(s){
-		$rootScope.$on(s,function($targetScope,x,y){
-
-		});
-	});*/
 	/**
 	 * Calculate icon offset
 	 * @param file
@@ -197,30 +173,51 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 				sortFiles();
 				$scope.$apply();
 				aBodyTd = aTables[1].querySelector('tr').children;
-				setTableHeadSize();
+				handleWidthChanged();
 			} else {
 				console.log('result.error',result.error); // todo: handle error
 			}
 		});
 	}
-	function sortFiles(){
+	function sortFiles(by){
+		console.log('sortFiles',by); // log
+		if (by===undefined) by = 'name';
 		$scope.files.sort(function(a,b){
 			if ((a.type==='dir'&&b.type!=='dir')||a.name==='..') {
 				return -1;
 			} if ((a.type!=='dir'&&b.type==='dir')||b.name==='..') {
 				return 1;
 			} else {
-				if (a.name > b.name) return -1;
-				if (a.name < b.name) return 1;
+				if (a[by]>b[by]) return -1;
+				if (a[by]<b[by]) return 1;
 				return 0;
 			}
 		});
 	}
-	function setTableHeadSize(){
+
+	function handleWidthChanged(){
 		if (aBodyTd) {
 			for (var i=0,l=aBodyTd.length-1;i<l;i++) {
 				aHeadTd[i].style.width = aBodyTd[i].offsetWidth+'px';
 			}
+		}
+	}
+	function handleHeightChanged($targetScope,h){
+		mScroll.style.height = (h-85)+'px';
+	}
+	function handleMoveFiles($targetScope,x,y){
+		console.log('move-files',$targetScope,x,y); // log
+	}
+	function handleKeyUp(keyCode){
+		if (keyCode===Key.RETURN) {
+			// todo: select file/folder and possibly close
+		} else if (keyCode===Key.SPACE) {
+			// todo: highlight file/folder
+		} else if (keyCode===Key.ESC) {
+			console.log('escape pressed'); // log
+			$rootScope.$emit('close');
+		} else {
+
 		}
 	}
 });
