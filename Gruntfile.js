@@ -120,7 +120,7 @@ module.exports = function (grunt) {
 						,src: ['**']
 						,dest: 'dist/css/'
 						,filter: function(src){
-							return src.indexOf('sfbrowser.css')!==-1||['less','css','bootstrap'].indexOf(src.split('.').pop())===-1;
+							return ['less','css','bootstrap'].indexOf(src.split('.').pop())===-1;
 						}
 					}
 				]
@@ -154,9 +154,13 @@ module.exports = function (grunt) {
 				prefix: '<script type="text/ng-template" id="%filename%">'
 				,suffix: '</script>'
 			},
+//			dist: {
+//				src: ['src/tpl/*.html','src/tpl/*'],
+//				dest: 'dist/sfbrowser.html'
+//			},
 			dist: {
 				src: ['src/tpl/*.html','src/tpl/*'],
-				dest: 'dist/sfbrowser.html'
+				dest: 'temp/templates.html'
 			}
 		},
 
@@ -179,9 +183,13 @@ module.exports = function (grunt) {
 			options: {
 				compress: true
 			}
-			,dev: {
+			,dist: {
 				src: ['src/less/sfbrowser.less'],
 				dest: 'dist/css/sfbrowser.css'
+			}
+			,dev: {
+				src: ['src/less/sfbrowser.less'],
+				dest: 'src/less/sfbrowser.css'
 			}
 		}
 
@@ -199,16 +207,21 @@ module.exports = function (grunt) {
 		function includeInto(file){
 			iNumFiles++;
 			var sFileContents = fs.readFileSync(file).toString()
-				,aMatch = sFileContents.match(/\/\*\s?include\s+.*\s?\*\//g);
+				,aMatch = sFileContents.match(/\/\*\s?include(\s\-esc)?\s+.*\s?\*\//g);
 			if (aMatch) {
 				aMatch.forEach(function(include){
-					var sFile = include.match(/(\/\*\s?include\s+)(.*)(\s?\*\/)/)[2]
+					var aFile = include.match(/(\/\*\s?include(\s\-esc)?\s+)(.*)(\s?\*\/)/)
+						,sFile = aFile[3]
 						,aSplit = file.split('/')
-						,sPath;
+						,sPath
+						,bEsc = include.indexOf(' -esc ')!==-1;
 					aSplit.pop();
 					sPath = aSplit.join('/')+'/';
 					console.log('including ',sPath+sFile); // log
-					sFileContents = sFileContents.replace(include,includeInto(sPath+sFile));
+//					if (bEsc) sFileContents = sFileContents.replace(include,encodeURIComponent(includeInto(sPath+sFile)).replace('\'','\\\\'));
+//					if (bEsc) sFileContents = sFileContents.replace(include,includeInto(sPath+sFile).replace(/'/gi,'\\\''));
+					if (bEsc) sFileContents = sFileContents.replace(include,encodeURIComponent(includeInto(sPath+sFile)).replace(/'/gi,'\\\''));
+					else sFileContents = sFileContents.replace(include,includeInto(sPath+sFile));
 				});
 			}
 			return sFileContents;
@@ -251,5 +264,9 @@ module.exports = function (grunt) {
 		,'wrapconcat:dist'
 		,'uglify:dist'
 	]);
+
+
+	grunt.registerTask('css',['less:dev','includejs:temp','copy:temp']);
+	grunt.registerTask('tpl',['wrapconcat','includejs:temp','copy:temp']);
 
 };

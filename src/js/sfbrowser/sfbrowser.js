@@ -1,11 +1,14 @@
+/* global sTemplates */
 angular.module('sfbrowser',['ngResource'])
 	/*.config(function($provide, $compileProvider, $filterProvider){
 	})*/
 	.run(function($http,$injector){
 		'use strict';
-		$http.get('sfbrowser.html').success(function(response){
-			$injector.get('$compile')(response);
-		});
+		$injector.get('$compile')(decodeURIComponent('/*include -esc ../../../temp/templates.html*/'));
+//		$injector.get('$compile')(decodeURIComponent(sTemplates));
+//		$http.get('sfbrowser.html').success(function(response){
+//			$injector.get('$compile')(response);
+//		});
 	})
 //	.factory('createSfbElement',function($templateCache){
 //		return function(){
