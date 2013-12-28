@@ -195,9 +195,20 @@ module.exports = function (grunt) {
 
 	});
 
+	// todo: grunt-include-all
+	/* include -e asdf/qwer.js */
+	/*
+	-e escape quotes
+	-u encodeURIComponent
+	-b base64 encoding
+	
+	config
+	cwd .
+	regex /\/\*\s?include(\s\-\w)?\s+.*\s?\*\//g
+	*/
 	grunt.registerMultiTask('includejs', '', function() {
 		//var oOptions = this.options({});
-		var sCwd = this.data.cwd
+		var sCwd = this.data.cwd||''
 			,sDest = this.data.dest
 			,iNumFiles = 0;
 		this.data.src.forEach(function(src){
