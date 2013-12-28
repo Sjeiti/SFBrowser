@@ -13,14 +13,10 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 		,sUriAngularBase = 'js/vendor/angular.js'
 		,sUriAngularResource = 'js/vendor/angular-resource.min.js'
 		//
-//		,sTemplates = '/*include -esc ../../temp/templates.html*/'
-		,sCss = '/*include -esc ../less/sfbrowser.css*/'
-		//
 		,oSFBInjector
 	;
-//	132312;
-//	console.log('sCss',sCss); // log
-//	console.log('sTemplates',sTemplates); // log
+	234;
+	console.log('base64','/*include -base64 ../../../less/fileSheet.png*/'); // log
 
 	// try to load from CDN or fallback to local files (and one by one or sometimes error)
 	window.angular&&initModule()
@@ -30,10 +26,6 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 		});
 	// and proceed...
 	function initModule(){
-		var mStyle = document.createElement('style');
-		mStyle.innerHTML = decodeURIComponent(sCss);
-		document.body.appendChild(mStyle);
-		//
 		var oSFB = {};
 		/*include sfbrowser/sfbrowser.js*/
 		angular.bootstrap(oSFB, ['sfbrowser']);

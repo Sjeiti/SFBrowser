@@ -214,13 +214,16 @@ module.exports = function (grunt) {
 						,sFile = aFile[3]
 						,aSplit = file.split('/')
 						,sPath
-						,bEsc = include.indexOf(' -esc ')!==-1;
+						,bEsc = include.indexOf(' -esc ')!==-1
+						,bBase64 = include.indexOf(' -base64 ')!==-1
+					;
 					aSplit.pop();
 					sPath = aSplit.join('/')+'/';
 					console.log('including ',sPath+sFile); // log
 //					if (bEsc) sFileContents = sFileContents.replace(include,encodeURIComponent(includeInto(sPath+sFile)).replace('\'','\\\\'));
 //					if (bEsc) sFileContents = sFileContents.replace(include,includeInto(sPath+sFile).replace(/'/gi,'\\\''));
 					if (bEsc) sFileContents = sFileContents.replace(include,encodeURIComponent(includeInto(sPath+sFile)).replace(/'/gi,'\\\''));
+					else if (bBase64) sFileContents = sFileContents.replace(include,new Buffer(includeInto(sPath+sFile)).toString('base64'));
 					else sFileContents = sFileContents.replace(include,includeInto(sPath+sFile));
 				});
 			}
