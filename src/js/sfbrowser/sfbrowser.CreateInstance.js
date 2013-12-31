@@ -5,7 +5,7 @@ angular.module('sfbrowser').factory('CreateInstance',function($templateCache){
 		angular.bootstrap(mElement, ['sfbInstance']);
 		//
 		var mStyle = document.createElement('style');
-		mStyle.innerHTML = decodeURIComponent('/*include -esc ../../less/sfbrowser.css*/');
+		mStyle.innerHTML = decodeURIComponent('/*include -e ../../less/sfbrowser.css*/');
 		mElement.appendChild(mStyle);
 		//
 		document.body.appendChild(mElement);

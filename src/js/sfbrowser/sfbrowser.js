@@ -3,7 +3,7 @@ angular.module('sfbrowser',['ngResource'])
 	})*/
 	.run(function($http,$injector){
 		'use strict';
-		$injector.get('$compile')(decodeURIComponent('/*include -esc ../../../temp/templates.html*/'));
+		$injector.get('$compile')(decodeURIComponent('/*include -e ../../../temp/templates.html*/'));
 	})
 //	.factory('createSfbElement',function($templateCache){
 //		return function(){

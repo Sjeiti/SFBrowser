@@ -1,11 +1,12 @@
 angular.module('sfbInstance').directive('draggable', function($rootScope) {
+	'use strict';
 	function link(scope, element, attrs) {
 		var mElement = element[0]
 			,iOffsetX
 			,iOffsetY
 			,sEmit = attrs.draggable
 			,mBody = document.body
-			,oBodyClass = mBody.classList
+			//,oBodyClass = mBody.classList
 		;
 		mElement.addEventListener('mousedown',handleElementMouseDown,false);
 		function handleElementMouseDown(e){

@@ -14,6 +14,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 	$rootScope.$on('heightChanged',handleHeightChanged);
 	$rootScope.$on('widthChanged',handleWidthChanged);
 	$rootScope.$on('move-files',handleMoveFiles);
+	$rootScope.$on('selectFiles',selectFiles);
 	Key.keyUp(handleKeyUp);
 
 	$scope.handleFileKeyUp = function(e){
@@ -51,15 +52,26 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		if (file.type==='dir') {
 			setFolder(file.name);
 		} else {
-			var aSelected = [];
-			$scope.files.forEach(function(file){
-				if (file.selected) {
-					aSelected.push(file);
-				}
-			});
-			callback(aSelected);
+			selectFiles();
+//			var aSelected = [];
+//			$scope.files.forEach(function(file){
+//				if (file.selected) {
+//					aSelected.push(file);
+//				}
+//			});
+//			callback(aSelected);
 		}
 	};
+	function selectFiles(){
+		var aSelected = [];
+		$scope.files.forEach(function(file){
+			if (file.selected) {
+				aSelected.push(file);
+			}
+		});
+		callback(aSelected);
+		$rootScope.$emit('close');
+	}
 	$scope.deleteFile = function(file){
 		if (file.type==='dir') {
 			console.log('todo rem dir'); // todo: rem dir

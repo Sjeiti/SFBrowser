@@ -15,8 +15,9 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 		//
 		,oSFBInjector
 	;
-	234;
-	console.log('base64','/*include -base64 ../../../less/fileSheet.png*/'); // log
+
+	//console.log('base64','/*include -b ../less/fileSheet.png*/'); // log
+	//console.log('base64','/*include -b ../less/iconSheet.png*/'); // log
 
 	// try to load from CDN or fallback to local files (and one by one or sometimes error)
 	window.angular&&initModule()

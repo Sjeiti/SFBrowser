@@ -11,6 +11,9 @@ angular.module('sfbInstance').controller('SfbCtrl',function($scope,$rootScope,$e
 	this.close = function(){
 		$rootScope.$emit('close');
 	};
+	this.select = function(){
+		$rootScope.$emit('selectFiles');
+	};
 
 	$rootScope.$on('view',function(){
 		that.layout = that.layout==='grid'?'list':'grid';

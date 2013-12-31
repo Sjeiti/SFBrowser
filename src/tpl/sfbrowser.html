@@ -8,8 +8,8 @@
 		<ng-include src="sfb.menuMain"></ng-include>
 		<ng-include src="sfb.fileTable"></ng-include>
 		<div class="select">
-			<button class="btn btn-default btn-sm">Cancel</button>
-			<button class="btn btn-primary btn-sm">Select</button>
+			<button data-ng-click="sfb.close()" class="btn btn-default btn-sm">Cancel</button>
+			<button data-ng-click="sfb.select()" class="btn btn-primary btn-sm">Select</button>
 		</div>
 		<div class="sfb-move"		draggable="move"></div>
 		<div class="sfb-resize-l"	draggable="resize-l"></div>

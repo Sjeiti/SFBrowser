@@ -1,5 +1,6 @@
 /* global module */
 /* global require */
+/* global Buffer */
 module.exports = function (grunt) {
 	/* jshint strict: false */
 
@@ -201,10 +202,14 @@ module.exports = function (grunt) {
 	-e escape quotes
 	-u encodeURIComponent
 	-b base64 encoding
-	
+
 	config
 	cwd .
-	regex /\/\*\s?include(\s\-\w)?\s+.*\s?\*\//g
+	regex /\/\*\s?include(\s\-\w)?\s+.*\s?\*\//
+
+	data:image/jpeg;base64,
+	data:image/png;base64,
+	data:image/gif;base64,
 	*/
 	grunt.registerMultiTask('includejs', '', function() {
 		//var oOptions = this.options({});
@@ -218,24 +223,29 @@ module.exports = function (grunt) {
 		function includeInto(file){
 			iNumFiles++;
 			var sFileContents = fs.readFileSync(file).toString()
-				,aMatch = sFileContents.match(/\/\*\s?include(\s\-esc)?\s+.*\s?\*\//g);
+				,aMatch = sFileContents.match(/\/\*!?\s?include(\s\-\w)?\s+[^\s]*\s?\*\//g);
 			if (aMatch) {
 				aMatch.forEach(function(include){
-					var aFile = include.match(/(\/\*\s?include(\s\-esc)?\s+)(.*)(\s?\*\/)/)
-						,sFile = aFile[3]
+					var aFile = include.match(/(\/\*!?\s?include(\s\-\w)?\s+)([^\s]*)\s?\*\//)
+						,sFile = aFile[aFile.length-1]
 						,aSplit = file.split('/')
 						,sPath
-						,bEsc = include.indexOf(' -esc ')!==-1
-						,bBase64 = include.indexOf(' -base64 ')!==-1
+						,bEsc = include.indexOf(' -e ')!==-1
+						,bBase64 = include.indexOf(' -b ')!==-1
 					;
 					aSplit.pop();
 					sPath = aSplit.join('/')+'/';
-					console.log('including ',sPath+sFile); // log
-//					if (bEsc) sFileContents = sFileContents.replace(include,encodeURIComponent(includeInto(sPath+sFile)).replace('\'','\\\\'));
-//					if (bEsc) sFileContents = sFileContents.replace(include,includeInto(sPath+sFile).replace(/'/gi,'\\\''));
-					if (bEsc) sFileContents = sFileContents.replace(include,encodeURIComponent(includeInto(sPath+sFile)).replace(/'/gi,'\\\''));
-					else if (bBase64) sFileContents = sFileContents.replace(include,new Buffer(includeInto(sPath+sFile)).toString('base64'));
-					else sFileContents = sFileContents.replace(include,includeInto(sPath+sFile));
+					console.log('including ',fs.existsSync(sPath+sFile),sPath+sFile); // log
+					if (bEsc) {
+//						sFileContents = sFileContents.replace(include,includeInto(sPath+sFile).replace(/'/gi,'\\\'').replace(/"/gi,'\\\"'));
+						sFileContents = sFileContents.replace(include,encodeURIComponent(includeInto(sPath+sFile)).replace(/'/gi,'\\\'').replace(/"/gi,'\\\"'));
+//						var qs = require('querystring');
+//						sFileContents = sFileContents.replace(include,qs.escape(encodeURIComponent(includeInto(sPath+sFile))));
+					} else if (bBase64) {
+						sFileContents = sFileContents.replace(include,'background-image:url(data:image/png;base64,'+fs.readFileSync(sPath+sFile).toString('base64')+');');
+					} else {
+						sFileContents = sFileContents.replace(include,includeInto(sPath+sFile));
+					}
 				});
 			}
 			return sFileContents;
