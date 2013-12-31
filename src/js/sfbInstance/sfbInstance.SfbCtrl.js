@@ -1,4 +1,4 @@
-angular.module('sfbInstance').controller('SfbCtrl',function($scope,$rootScope,$element) {
+angular.module('sfbInstance').controller('SfbCtrl',function($scope,$rootScope,$element,Api) {
 	'use strict';
 	var that = this;
 	this.layout = 'list';
@@ -21,4 +21,27 @@ angular.module('sfbInstance').controller('SfbCtrl',function($scope,$rootScope,$e
 	$rootScope.$on('close',function(){
 		$element.remove();
 	});
+
+	//
+	// //
+	//
+	// http://jsfiddle.net/vishalvasani/4hqVu/
+	// http://jsfiddle.net/winduptoy/QhA3q/
+	// http://angular-file-upload.appspot.com/
+
+
+	$element[0].addEventListener('dragover', handleStop, false);
+	$element[0].addEventListener('drop', handleDrop, false);
+
+	function handleStop(e){
+		e.stopPropagation();
+		e.preventDefault();
+	}
+
+	function handleDrop(e){
+		e.stopPropagation();
+		e.preventDefault();
+		$rootScope.$emit('upload',e.dataTransfer.files);
+	}
+
 });

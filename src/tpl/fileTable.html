@@ -15,6 +15,18 @@
 		<table>
 			<tbody>
 			<tr
+				data-ng-repeat="file in uploads"
+				data-ng-model="file"
+				class="upload"
+			>
+				<td>{{file.name}}</td>
+				<td></td>
+				<td>{{file.lastModified|date:'yyyy-MM-dd'}}</td>
+				<td>{{formatSize(file)}}</td>
+				<td></td>
+				<td><button data-ng-click="cancelUpload(file)">del</button></td>
+			</tr>
+			<tr
 				data-ng-click="handleTrClick($event,file)"
 				data-ng-dblclick="handleTrDblClick(file)"
 				data-ng-repeat="file in files"

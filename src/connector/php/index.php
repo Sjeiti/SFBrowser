@@ -64,6 +64,47 @@ class SfBrowser {
 			echo json_encode($this->aResponse);
 		});
 
+		$app->post('/upload/:folder', function($folder) {
+			$sFolder = urldecode($folder);
+			//
+			$this->aResponse['data'] = $sFolder;
+			$this->aResponse['numFiles'] = count($_FILES);
+			$this->aResponse['issetFiles'] = isset($_FILES);
+//			print_r($_FILES);
+//			if (
+//				$this->notError($this->withinRoot($sFile),"Invalid path: '$sFile' not in root folder")
+//				// todo: check $sFileTo is within root
+//				&&$this->notError(file_exists($sFile),"The file '$file' does not exist")
+//				&&$this->notError(rename($sFile,$sFileTo),"The file '$file' could not be renamed")
+//			) {
+//				$this->aResponse['success'] = true;
+//				$this->aResponse['data'] = $sFile.' => '.$sFileTo;
+//			}
+			echo json_encode($this->aResponse);
+		});
+
+		$app->post('/upload', function() {
+//			$this->aResponse['numFiles'] = count($_FILES);
+//			$this->aResponse['post'] = print_r($_POST,true);
+			$aFiles = array();
+			$bUploaded = true;
+			$sFolder = urldecode($_POST['folder']);
+			foreach ($_FILES as $file) {
+				$sTarget = ROOTFOLDER.'/'.$sFolder.'/'.$file['name'];
+				if (move_uploaded_file($file['tmp_name'],$sTarget)) {
+					$oFNfo = $this->fileInfo($sTarget);
+					if ($oFNfo) $aFiles[] = $oFNfo;
+				} else {
+					$bUploaded = false;
+				}
+			}
+			if ($bUploaded) {
+				$this->aResponse['success'] = true;
+			}
+			$this->aResponse['data'] = $aFiles;
+			echo json_encode($this->aResponse);
+		});
+
 		$app->run();
 	}
 
