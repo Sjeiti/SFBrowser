@@ -49,19 +49,15 @@
 		&.sortasc:after { border-top: @arrowSize solid @colorSfb; }
 		&.sortdesc:after { border-bottom: @arrowSize solid @colorSfb; }
 	}
-	a[download] {
-		.hide-text();
-		&:before {
-			content: 'd';
-			font: 10px/10px Arial, sans;
-			color: black;
-		}
-	}
 	button {
 		border: 0;
 		background-color: transparent;
 		margin: 0;
 		padding: 0;
+	}
+	[class^="icon-"], [class*=" icon-"] {
+		font-size: 12px;
+		line-height: 12px;
 	}
 	input[type=text] {
 		padding: 1px 6px;
@@ -80,6 +76,7 @@
 			white-space: nowrap;
 			height: @trHeight;
 			border-top: 1px solid #EEE;
+			.transition(background-color 200ms linear);
 			&:hover {
 				background-color: #eafdff;
 			}

@@ -20,11 +20,11 @@
 				class="upload"
 			>
 				<td>{{file.name}}</td>
-				<td class="progress"><div style="width:{{file.progress}}%;"></div></td>
+				<td class="progress"><div data-ng-style="{width:file.progress+'%'}"></div></td>
 				<td>{{file.lastModified|date:'yyyy-MM-dd'}}</td>
 				<td>{{formatSize(file)}}</td>
 				<td></td>
-				<td><button data-ng-click="cancelUpload(file)">del</button></td>
+				<td><button data-ng-click="cancelUpload(file)" class="icon-close"><span>delete</span></button></td>
 
 			</tr>
 			<tr
@@ -32,7 +32,7 @@
 				data-ng-dblclick="handleTrDblClick(file)"
 				data-ng-repeat="file in files"
 				data-ng-model="file"
-				draggable="move-files"
+				data-sfb-drag="move-files"
 				class="{{file.selected?'selected':''}}"
 			>
 				<td style="{{icon(file)}}"><input type="text"
@@ -46,8 +46,8 @@
 				<td>{{file.dimensions}}</td>
 				<td>
 					<div ng-if="file.type==='file'">
-						<a href="{{file.path+'/'+file.name}}" download="{{file.name}}">download</a>
-						<button data-ng-click="deleteFile(file)">del</button>
+						<a href="{{file.path+'/'+file.name}}" download="{{file.name}}" class="icon-download"><span>download</span></a>
+						<button data-ng-click="deleteFile(file)" class="icon-remove"><span>delete</span></button>
 					</div>
 				</td>
 			</tr>

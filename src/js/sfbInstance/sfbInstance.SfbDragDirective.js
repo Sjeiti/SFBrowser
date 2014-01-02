@@ -5,7 +5,6 @@ angular.module('sfbInstance').directive('sfbDrag', function(SfbWindowModel) {
 			,iOffsetX
 			,iOffsetY
 			,sEmit = attrs.sfbDrag
-			,mBody = document.body
 		;
 		mElement.addEventListener('mousedown',handleElementMouseDown,false);
 		function handleElementMouseDown(e){

@@ -213,7 +213,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 
 	$rootScope.$on('upload',function($onScope,files){
 		SfbFilesModel.uploadFiles(files,function(){
-			$scope.$apply();
+			setTimeout(function(){$scope.$apply();},40);
 		},function(success){
 			if (success) {
 				sortFiles();
@@ -222,4 +222,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		});
 		$scope.$apply();
 	});
+	$scope.cancelUpload = function(file){
+		SfbFilesModel.abortUpload(file);
+	};
 });

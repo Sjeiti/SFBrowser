@@ -2,6 +2,7 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(Api) {
 	'use strict';
 	var sBaseFolder = 'data/'
 		,aUploads = []
+		,bUploading = false
 		,aCurrentList
 		,oReturn = {
 			currentFolder: ''
@@ -10,6 +11,7 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(Api) {
 			,deleteFile: deleteFile
 			,renameFile: renameFile
 			,uploadFiles: uploadFiles
+			,abortUpload: abortUpload
 		}
 	;
 	function getList(folder,callback){
@@ -76,22 +78,24 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(Api) {
 				progress: 0
 			}));
 		}
-		uploadFile(progress,complete);
+		if (!bUploading) uploadFile(progress,complete);
 	}
 	//
     function uploadFile(progress,complete) {
         var oFormData = new FormData()
 			,oUploadFile = aUploads[0]
+			,oXHR = new XMLHttpRequest()
 		;
+		oUploadFile.xhr = oXHR;
         oFormData.append('folder',oReturn.currentFolder);
         oFormData.append('file',oUploadFile);
-        var xhr = new XMLHttpRequest();
-        xhr.upload.addEventListener('progress', handleUploadProgress, false);
-        xhr.addEventListener('load', handleUploadComplete, false);
-        xhr.addEventListener('error', handleUploadFailed, false);
-        xhr.addEventListener('abort', handleUploadCanceled, false);
-        xhr.open('POST', 'connector/php/upload');
-        xhr.send(oFormData);
+        oXHR.upload.addEventListener('progress', handleUploadProgress, false);
+        oXHR.addEventListener('load', handleUploadComplete, false);
+        oXHR.addEventListener('error', handleUploadFailed, false);
+        oXHR.addEventListener('abort', handleUploadCanceled, false);
+        oXHR.open('POST', 'connector/php/upload');
+        oXHR.send(oFormData);
+		bUploading = true;
 
 		function handleUploadProgress(e){
 			if (e.lengthComputable) {
@@ -100,24 +104,40 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(Api) {
 			}
 		}
 		function handleUploadComplete(e){
-			// todo: add response error to json
-			var sJsonString = e.currentTarget.response.match(/{.*}/g)[0]
-				,oResponse = JSON.parse(sJsonString)
-				,iIndex = aUploads.indexOf(oUploadFile);
-			aUploads.splice(iIndex,1);
+			// todo: add response error to json (sometimes no json when large files)
+			var aJsonString = e.currentTarget.response.match(/{.*}/g)
+				,oResponse = aJsonString?JSON.parse(aJsonString[0]):{success:false}
+			;
+			bUploading = false;
 			if (oResponse.success) {
 				aCurrentList.push(oResponse.data.pop());
 			}
-			if (aUploads.length===0) {
+			if (!nextUpload()) {
 				complete(oResponse.success);
-			} else {
-				progress();
-				uploadFile(progress,complete);
 			}
 		}
-		function handleUploadFailed(e){console.log('uploadFailed',e);}
-		function handleUploadCanceled(e){console.log('uploadCanceled',e);}
+		function handleUploadFailed(){
+			nextUpload();
+		}
+		function handleUploadCanceled(){
+			nextUpload();
+		}
+		function nextUpload(){
+			removeFromUploads(oUploadFile);
+			var bRemainingUploads = aUploads.length>0;
+			if (bRemainingUploads) uploadFile(progress,complete);
+			progress();
+			return bRemainingUploads;
+		}
     }
+	function abortUpload(file){
+		if (file.xhr) file.xhr.abort();
+		else removeFromUploads(file);
+	}
+	function removeFromUploads(file){
+		var iIndex = aUploads.indexOf(file);
+		aUploads.splice(iIndex,1);
+	}
 	/**
 	 * Formats a number to the appropriate filesize notation
 	 * @name iddqd.internal.native.number.formatSize

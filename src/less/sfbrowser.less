@@ -12,7 +12,7 @@
 @colorSfb: #428BCA;//#526930;
 
 .sfb {
-	button[class^="icon-"] {
+	[class^="icon-"], [class*=" icon-"] {
 		margin: 0;
 		padding: 0;
 		border: 0;
@@ -21,11 +21,15 @@
 		background-color: transparent;
 		&:hover {
 			color: lighten(@colorSfb,10%);
+			text-decoration: none;
 		}
 		&:focus {
 			outline-size: 0px;
 			outline-style: none;
 			outline-color: tranparent;
+		}
+		span {
+			.hide-text();
 		}
 	}
 	.select {
