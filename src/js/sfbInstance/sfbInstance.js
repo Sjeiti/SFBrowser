@@ -1,5 +1,5 @@
 /* global oSFBInjector */
-angular.module('sfbInstance',[])
+angular.module('sfbInstance',['ngAnimate'])
 	.constant('Api',oSFBInjector.get('Api'))
 	.constant('$templateCache',oSFBInjector.get('$templateCache'))
 	.constant('Key',oSFBInjector.get('Key'))

@@ -8,10 +8,14 @@
 if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 	'use strict';
 	var sUriCDN = '//ajax.googleapis.com/ajax/libs/angularjs/1.2.5/'
+		//
 		,sUriAngularBaseCDN = sUriCDN+'angular.js'
 		,sUriAngularResourceCDN = sUriCDN+'angular-resource.js'
+		,sUriAngularAnimateCDN = sUriCDN+'angular-animate.js'
+		//
 		,sUriAngularBase = 'js/vendor/angular.js'
 		,sUriAngularResource = 'js/vendor/angular-resource.min.js'
+		,sUriAngularAnimate = 'js/vendor/angular-animate.min.js'
 		//
 		,oSFBInjector
 	;
@@ -21,9 +25,9 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 
 	// try to load from CDN or fallback to local files (and one by one or sometimes error)
 	window.angular&&initModule()
-	||loadScripts([sUriAngularBaseCDN,sUriAngularResourceCDN],true)
+	||loadScripts([sUriAngularBaseCDN,sUriAngularResourceCDN,sUriAngularAnimateCDN],true)
 		.then(initModule,function (){
-			loadScripts([sUriAngularBase,sUriAngularResource],true).then(initModule);
+			loadScripts([sUriAngularBase,sUriAngularResource,sUriAngularAnimate],true).then(initModule);
 		});
 	// and proceed...
 	function initModule(){

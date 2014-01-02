@@ -66,12 +66,6 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(Api) {
 			});
 		}
 	}
-	// lastModified: 1284304240000
-	// lastModifiedDate: Sun Sep 12 2010 17:10:40 GMT+0200 (W. Europe Daylight Time)
-	// name: "P1020179.JPG"
-	// size: 2942741
-	// type: "image/jpeg"
-	// webkitRelativePath: ""
 	function uploadFiles(files,progress,complete){
 		for (var i=0,l=files.length;i<l;i++) {
 			aUploads.push(angular.extend(files[i],{
@@ -80,7 +74,17 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(Api) {
 		}
 		if (!bUploading) uploadFile(progress,complete);
 	}
+	function abortUpload(file){
+		if (file.xhr) file.xhr.abort();
+		else removeFromUploads(file);
+	}
 	//
+	// lastModified: 1284304240000
+	// lastModifiedDate: Sun Sep 12 2010 17:10:40 GMT+0200 (W. Europe Daylight Time)
+	// name: "P1020179.JPG"
+	// size: 2942741
+	// type: "image/jpeg"
+	// webkitRelativePath: ""
     function uploadFile(progress,complete) {
         var oFormData = new FormData()
 			,oUploadFile = aUploads[0]
@@ -96,7 +100,6 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(Api) {
         oXHR.open('POST', 'connector/php/upload');
         oXHR.send(oFormData);
 		bUploading = true;
-
 		function handleUploadProgress(e){
 			if (e.lengthComputable) {
 				oUploadFile.progress = 100*e.loaded/e.total<<0;
@@ -130,10 +133,6 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(Api) {
 			return bRemainingUploads;
 		}
     }
-	function abortUpload(file){
-		if (file.xhr) file.xhr.abort();
-		else removeFromUploads(file);
-	}
 	function removeFromUploads(file){
 		var iIndex = aUploads.indexOf(file);
 		aUploads.splice(iIndex,1);
