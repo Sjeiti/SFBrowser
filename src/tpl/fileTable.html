@@ -20,11 +20,12 @@
 				class="upload"
 			>
 				<td>{{file.name}}</td>
-				<td></td>
+				<td class="progress"><div style="width:{{file.progress}}%;"></div></td>
 				<td>{{file.lastModified|date:'yyyy-MM-dd'}}</td>
 				<td>{{formatSize(file)}}</td>
 				<td></td>
 				<td><button data-ng-click="cancelUpload(file)">del</button></td>
+
 			</tr>
 			<tr
 				data-ng-click="handleTrClick($event,file)"

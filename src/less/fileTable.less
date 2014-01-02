@@ -1,5 +1,6 @@
 .sfb-filetable {
 	@theadHeight: 16px;
+	@trHeight: 21px;
 	position: relative;
 	z-index: 1;
 	clear: both;
@@ -48,18 +49,6 @@
 		&.sortasc:after { border-top: @arrowSize solid @colorSfb; }
 		&.sortdesc:after { border-bottom: @arrowSize solid @colorSfb; }
 	}
-	td {
-		font: 12px/16px Arial,sans;
-		&:first-child {
-			padding-left: 16px;
-		}
-	}
-	tr {
-		white-space: nowrap;
-		&.upload {
-			background-color: #c5e0a5;
-		}
-	}
 	a[download] {
 		.hide-text();
 		&:before {
@@ -88,6 +77,8 @@
 		font-size: 9px;
 		background-color: #FFF;
 		tr {
+			white-space: nowrap;
+			height: @trHeight;
 			border-top: 1px solid #EEE;
 			&.selected {
 				background-color: #dbf5f8;
@@ -95,16 +86,39 @@
 			&:hover {
 				background-color: #eafdff;
 			}
+			&.upload {
+				position: relative;
+				&,&:hover {
+					background-color: #F3FFB3;
+				}
+				td:first-child {
+					padding-left: 22px;
+				}
+				.progress {
+					position: static;
+					z-index: 0;
+					div {
+						.lt(0,1);
+						height: @trHeight;
+						background-color: #CBDA80;
+					}
+				}
+			}
 		}
-		td:first-child {
+		td {
 			position: relative;
-			&:before {
-				content: '';
-				.square(16px);
-				.lt(3,1);
-//				background: url(css/fileSheet.png) no-repeat;
-				/*! include -b fileSheet.png */
-				background-position: inherit;
+			z-index: 1;
+			font: 12px/16px Arial,sans;
+			&:first-child {
+				padding-left: 16px;
+				&:before {
+					content: '';
+					.square(16px);
+					.lt(3,1);
+					//background: url(css/fileSheet.png) no-repeat;
+					/*! include -b fileSheet.png */
+					background-position: inherit;
+				}
 			}
 		}
 	}

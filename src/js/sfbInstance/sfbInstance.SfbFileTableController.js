@@ -1,13 +1,11 @@
-angular.module('sfbInstance').controller('sfbFileTableController',function($scope,$rootScope,Api,$element,callback,Key) {
+angular.module('sfbInstance').controller('sfbFileTableController',function($scope,$rootScope,SfbFilesModel,$element,callback,Key) {
 	'use strict';
 	var mElement = $element[0]
 		,mScroll = mElement.querySelector('.scroll')
 		,aTables = mElement.querySelectorAll('table')
 		,aHeadTd = aTables[0].querySelector('tr').children
 		,aBodyTd
-		,sCurrentFolder = ''
 		,oFileLastClicked
-		,sBaseFolder = 'data/'
 	;
 
 	setFolder();
@@ -84,16 +82,8 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		if (file.type==='dir') {
 			console.log('todo rem dir'); // todo: rem dir
 		} else {
-			Api.delete({file:encodeURIComponent(sCurrentFolder+'/'+file.name)},function(result) {
-				if (result.success) {
-					var iIndex = $scope.files.indexOf(file);
-					if (iIndex!==-1) {
-						$scope.files.splice(iIndex,1);
-						$scope.$apply();
-					}
-				} else {
-					console.log('result.error',result.error);
-				}
+			SfbFilesModel.deleteFile(file,function(success){
+				if (success) $scope.$apply();
 			});
 		}
 	};
@@ -136,27 +126,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		// file td
 		return 'background-position:'+iHo+'px '+iVo+'px;';
 	};
-	/**
-	 * Formats a number to the appropriate filesize notation
-	 * @name iddqd.internal.native.number.formatSize
-	 * @method
-	 * @param {number} int The number to round
-	 * @param {number} round The number of decimals to round by
-	 * @returns {string} Filesize string result
-	 */
-	function formatSize(int,round) {
-		var i, size = int;
-		if (round===undefined) round = 0;
-		var aSizes = ['B','kB','MB','GB','TB','PB','EB','ZB','YB'];
-		for (i = 0; size>1024 && (aSizes.length>=(i + 2)); i++) size /= 1024;
-		var iMult = Math.pow(10,round);
-		return (Math.round(size * iMult) / iMult) + aSizes[i];
-	}
 	function checkEnabledInputs(){
-//		var aInputs = mElement.querySelectorAll('tbody input');
-//		for (var i=0,l=aInputs.length;i<l;i++){
-//			renameFile(aInputs[i]);
-//		}
 		$scope.files.forEach(function(file){
 			renameFile(file);
 		});
@@ -171,46 +141,19 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 	function renameFile(file){
 		if (file.nameEditing) {
 			file.nameEditing = false;
-			if (file.name!==file.originalName) {
-				Api.rename({
-					file:encodeURIComponent(sCurrentFolder+'/'+file.originalName)
-					,to:encodeURIComponent(sCurrentFolder+'/'+file.name)
-				},function(result) {
-					if (result.success) {
-						file.originalName = file.name;
-					} else {
-						file.name = file.originalName;
-						$scope.$apply();
-						console.log('result.error',result.error); // todo: handle error
-					}
-				});
-			}
+			SfbFilesModel.renameFile(file,function(success){
+				if (!success) $scope.$apply();
+			});
 		}
 	}
 	function setFolder(folder){
-					console.log('setFolder',folder); // log
-		var sNewFolder = sCurrentFolder+'/'+(folder||'');
-		Api.list({folder:encodeURIComponent(sNewFolder)},function(result) {
-			if (result.success) {
-				sCurrentFolder = sNewFolder;
-				result.data.forEach(function(file){
-					var bWH = file.width&&file.height;
-					file.originalName = file.name;
-					file.path = sBaseFolder+sCurrentFolder;
-					file.surface = bWH?file.width*file.height:'';
-					file.dimensions = bWH?(file.width+' x '+file.height):'';
-					file.sizeFormatted = file.type!=='dir'?formatSize(file.size):'';
-					file.nameEditing = false;
-
-				});
-				$scope.files = result.data;
-				sortFiles();
-				$scope.$apply();
-				aBodyTd = aTables[1].querySelector('tr').children;
-				handleWidthChanged();
-			} else {
-				console.log('result.error',result.error); // todo: handle error
-			}
+		console.log('setFolder',folder); // log
+		SfbFilesModel.getList(folder,function(list){
+			$scope.files = list;
+			sortFiles();
+			$scope.$apply();
+			aBodyTd = aTables[1].querySelector('tr').children;
+			handleWidthChanged();
 		});
 	}
 	function sortFiles(by,bDesc){
@@ -266,61 +209,17 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
 	/////////////////////////////////////////////
-	$scope.uploads = [];
+	$scope.uploads = SfbFilesModel.uploads;
+
 	$rootScope.$on('upload',function($onScope,files){
-		console.log('upload',arguments); // log
-		for (var i=0,l=files.length;i<l;i++) {
-			$scope.uploads.push(files[i]);
-		}
-		console.log('$scope.uploads',$scope.uploads); // log
-		$scope.$apply();
-		uploadFile();
-	});
-    function uploadFile() {
-        var oFormData = new FormData(), i = 0;
-        oFormData.append('folder',sCurrentFolder);
-		$scope.uploads.forEach(function(file){
-            oFormData.append('file'+(i++),file);
-		});
-        var xhr = new XMLHttpRequest();
-        xhr.upload.addEventListener("progress", uploadProgress, false);
-        xhr.addEventListener("load", uploadComplete, false);
-        xhr.addEventListener("error", uploadFailed, false);
-        xhr.addEventListener("abort", uploadCanceled, false);
-        xhr.open("POST", "connector/php/upload");
-        xhr.send(oFormData);
-		/*Api.upload({
-			folder:encodeURIComponent('folder')//sCurrentFolder
-			,formData:oFormData
-		},function(result) {
-			console.log('api',result); // log
-		});*/
-    }
-	function uploadProgress(e){
-        console.log('uploadProgress',Math.round(e.loaded * 100 / e.total)); // log
-	}
-	function uploadComplete(e){
-		var oResponse = JSON.parse(e.currentTarget.response);
-		console.log('uploadComplete',oResponse); // log
-		if (oResponse.success) {
-			oResponse.data.forEach(function(file){
-				$scope.uploads.forEach(function(upfile,i){
-					if (file.name===upfile.name) {
-						$scope.uploads.splice(i,1);
-						$scope.files.push(file);
-					}
-				});
-			});
-			sortFiles();
+		SfbFilesModel.uploadFiles(files,function(){
 			$scope.$apply();
-		}
-	}
-	function uploadFailed(e){console.log('uploadFailed',e);}
-	function uploadCanceled(e){console.log('uploadCanceled',e);}
+		},function(success){
+			if (success) {
+				sortFiles();
+			}
+			$scope.$apply();
+		});
+		$scope.$apply();
+	});
 });
-//angular.module('sfbInstance').directive('ng-file', function() {
-//	'use strict';
-//	function link(scope, element, attrs) {
-//	}
-//	return { link: link };
-//});

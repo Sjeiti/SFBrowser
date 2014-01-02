@@ -88,16 +88,32 @@ class SfBrowser {
 //			$this->aResponse['post'] = print_r($_POST,true);
 			$aFiles = array();
 			$bUploaded = true;
-			$sFolder = urldecode($_POST['folder']);
-			foreach ($_FILES as $file) {
-				$sTarget = ROOTFOLDER.'/'.$sFolder.'/'.$file['name'];
-				if (move_uploaded_file($file['tmp_name'],$sTarget)) {
-					$oFNfo = $this->fileInfo($sTarget);
-					if ($oFNfo) $aFiles[] = $oFNfo;
-				} else {
-					$bUploaded = false;
+
+			if ( $_SERVER['REQUEST_METHOD']=='POST'&&empty($_POST)&&empty($_FILES)&&$_SERVER['CONTENT_LENGTH']>0) {
+				$displayMaxSize = ini_get('post_max_size');
+				switch (substr($displayMaxSize,-1)) {
+					case 'G': $displayMaxSize = $displayMaxSize*1024;
+					case 'M': $displayMaxSize = $displayMaxSize*1024;
+					case 'K': $displayMaxSize = $displayMaxSize*1024;
+				}
+				$bUploaded = false;
+				$this->aResponse['error'] = 'Posted data is too large';
+				//$error = 'Posted data is too large. '.$_SERVER[CONTENT_LENGTH].' bytes exceeds the maximum size of '.$displayMaxSize.' bytes.';
+			} else {
+				$sFolder = urldecode($_POST['folder']);
+				foreach ($_FILES as $file) {
+					$sTarget = ROOTFOLDER.'/'.$sFolder.'/'.$file['name'];
+					if (move_uploaded_file($file['tmp_name'],$sTarget)) {
+						$oFNfo = $this->fileInfo($sTarget);
+						if ($oFNfo){
+							$aFiles[] = $oFNfo;
+						}
+					} else {
+						$bUploaded = false;
+					}
 				}
 			}
+
 			if ($bUploaded) {
 				$this->aResponse['success'] = true;
 			}

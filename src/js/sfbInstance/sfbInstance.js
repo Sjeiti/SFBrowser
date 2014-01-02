@@ -14,9 +14,11 @@ angular.module('sfbInstance',[])
 	})
 ;
 /*include sfbInstance.SfbController.js*/
+/*include sfbInstance.SfbFilesModel.js*/
 /*include sfbInstance.SfbWindowModel.js*/
 /*include sfbInstance.SfbWindowController.js*/
 /*include sfbInstance.SfbMenuController.js*/
 /*include sfbInstance.SfbFileTableController.js*/
 /*include sfbInstance.SfbDragDirective.js*/
 /*include sfbInstance.SfbResizeDirective.js*/
+/*include sfbInstance.SfbFileDropDirective.js*/

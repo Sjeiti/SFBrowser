@@ -1,8 +1,7 @@
-<div class="sfb sfb-modal" data-ng-controller="SfbController as sfb" data-sfb-resize>
+<div class="sfb sfb-modal" data-ng-controller="SfbController as sfb" data-sfb-resize data-sfb-file-drop>
 	<div
 		class="sfb-window sfb-{{sfb.layout}}"
 		data-ng-controller="SfbWindowController as sfbwin"
-		ng-style="{left:sfbwin.windowModel.x}"
 	>
 		<h3>SFBrowser {{sfbwin.windowModel.x}} {{sfbwin.windowModel.y}}</h3>
 		<div class="sfb-window-buttons">

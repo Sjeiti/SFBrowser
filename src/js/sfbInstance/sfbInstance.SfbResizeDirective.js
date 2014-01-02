@@ -1,6 +1,6 @@
 angular.module('sfbInstance').directive('sfbResize', function($window,$document,SfbWindowModel) {
 	'use strict';
-	function link() {//scope, element, attrs
+	function link() {
 		var mBody = $document.find('body')[0];
 		$window.addEventListener('resize',handleWindowResize,false);
 		function handleWindowResize(){
