@@ -1,4 +1,4 @@
-angular.module('sfbInstance').controller('SfbCtrl',function($scope,$rootScope,$element,Api) {
+angular.module('sfbInstance').controller('SfbController',function($scope,$rootScope,$element,Api) {
 	'use strict';
 	var that = this;
 	this.layout = 'list';

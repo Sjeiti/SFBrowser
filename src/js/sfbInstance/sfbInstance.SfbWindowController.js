@@ -1,4 +1,4 @@
-angular.module('sfbInstance').controller('SfbWindowCtrl',function($scope,$rootScope,$element) {
+angular.module('sfbInstance').controller('SfbWindowController',function($scope,$rootScope,$element) {
 	'use strict';
 	var mElement = $element[0]
 		,oStyle = mElement.style

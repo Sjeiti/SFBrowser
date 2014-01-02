@@ -37,13 +37,18 @@
 				<td style="{{icon(file)}}"><input type="text"
 					data-ng-keyup="handleFileKeyUp($event)"
 					data-ng-model="file.name"
-					disabled
+					data-ng-disabled="!file.nameEditing"
 				/></td>
 				<td>{{file.ext}}</td>
 				<td>{{file.time*1000|date:'yyyy-MM-dd'}}</td>
-				<td>{{formatSize(file)}}</td>
-				<td>{{fileDimensions(file)}}</td>
-				<td><button data-ng-click="deleteFile(file)">del</button></td>
+				<td>{{file.sizeFormatted}}</td>
+				<td>{{file.dimensions}}</td>
+				<td>
+					<div ng-if="file.type==='file'">
+						<a href="{{file.path+'/'+file.name}}" download="{{file.name}}">download</a>
+						<button data-ng-click="deleteFile(file)">del</button>
+					</div>
+				</td>
 			</tr>
 			</tbody>
 		</table>

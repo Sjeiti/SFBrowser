@@ -28,5 +28,13 @@ angular.module('sfbrowser').factory('Api',function($resource){
 				,to:'@to'
 			}
 		}
+		,upload: {
+			url: sUriAPI+'/upload/:base:folder'
+			,method: 'POST'
+			, params:{
+				base:sBase
+				,folder:'@folder'
+			}
+		}
 	});
 });

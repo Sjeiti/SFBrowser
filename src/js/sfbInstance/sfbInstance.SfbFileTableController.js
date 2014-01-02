@@ -7,6 +7,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		,aBodyTd
 		,sCurrentFolder = ''
 		,oFileLastClicked
+		,sBaseFolder = 'data/'
 	;
 
 	setFolder();
@@ -38,8 +39,8 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 				$scope.files[i].selected = true;
 			}
 		} else if (file.selected&&file.name!=='..'&&mTarget.nodeName==='INPUT') {
-			if (mTarget.getAttribute('disabled')!==null) {
-				mTarget.removeAttribute('disabled');
+			if (!file.nameEditing) {
+				file.nameEditing = true;
 			}
 		} else {
 			file.selected = !file.selected;
@@ -72,6 +73,13 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		callback(aSelected);
 		$rootScope.$emit('close');
 	}
+	/*$scope.getDownloadLink = function(file){
+		var mA = document.createElement('a');
+		mA.innerText = 'download';
+		mA.href = sCurrentFolder+file.name;
+		mA.download = file.name;
+		return mA;
+	};*/
 	$scope.deleteFile = function(file){
 		if (file.type==='dir') {
 			console.log('todo rem dir'); // todo: rem dir
@@ -88,12 +96,6 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 				}
 			});
 		}
-	};
-	$scope.fileDimensions = function(file){
-		return file.width&&file.height?(file.width+' x '+file.height):'';
-	};
-	$scope.formatSize = function(file){
-		return file.type!=='dir'?formatSize(file.size):'';
 	};
 	$scope.sortBy = function(e){
 		var mCTarget = e.currentTarget
@@ -151,10 +153,13 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		return (Math.round(size * iMult) / iMult) + aSizes[i];
 	}
 	function checkEnabledInputs(){
-		var aInputs = mElement.querySelectorAll('tbody input');
-		for (var i=0,l=aInputs.length;i<l;i++){
-			renameFile(aInputs[i]);
-		}
+//		var aInputs = mElement.querySelectorAll('tbody input');
+//		for (var i=0,l=aInputs.length;i<l;i++){
+//			renameFile(aInputs[i]);
+//		}
+		$scope.files.forEach(function(file){
+			renameFile(file);
+		});
 	}
 	function clearSelected(except){
 		var aFiles = $scope.files;
@@ -163,21 +168,18 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 			if (file!==except) file.selected = false;
 		}
 	}
-	function renameFile(inputElement){
-		if (inputElement.getAttribute('disabled')===null) {
-			inputElement.setAttribute('disabled','disabled');
-			var mTr = inputElement.parentNode.parentNode
-				,oModel = angular.element(mTr).controller('ngModel')
-				,oFile = oModel.$modelValue;
-			if (oFile.name!==oFile.originalName) {
+	function renameFile(file){
+		if (file.nameEditing) {
+			file.nameEditing = false;
+			if (file.name!==file.originalName) {
 				Api.rename({
-					file:encodeURIComponent(sCurrentFolder+'/'+oFile.originalName)
-					,to:encodeURIComponent(sCurrentFolder+'/'+oFile.name)
+					file:encodeURIComponent(sCurrentFolder+'/'+file.originalName)
+					,to:encodeURIComponent(sCurrentFolder+'/'+file.name)
 				},function(result) {
 					if (result.success) {
-						oFile.originalName = oFile.name;
+						file.originalName = file.name;
 					} else {
-						oFile.name = oFile.originalName;
+						file.name = file.originalName;
 						$scope.$apply();
 						console.log('result.error',result.error); // todo: handle error
 					}
@@ -186,15 +188,21 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		}
 	}
 	function setFolder(folder){
+					console.log('setFolder',folder); // log
 		var sNewFolder = sCurrentFolder+'/'+(folder||'');
 		Api.list({folder:encodeURIComponent(sNewFolder)},function(result) {
 			if (result.success) {
 				sCurrentFolder = sNewFolder;
 				result.data.forEach(function(file){
+					var bWH = file.width&&file.height;
 					file.originalName = file.name;
-					if (file.width&&file.height) {
-						file.surface = file.width*file.height;
-					}
+					file.path = sBaseFolder+sCurrentFolder;
+					file.surface = bWH?file.width*file.height:'';
+					file.dimensions = bWH?(file.width+' x '+file.height):'';
+					file.sizeFormatted = file.type!=='dir'?formatSize(file.size):'';
+					file.nameEditing = false;
+					console.log('file.editName',file.editName); // log
+
 				});
 				$scope.files = result.data;
 				sortFiles();
@@ -255,6 +263,10 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		}
 	}
 	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
+	/////////////////////////////////////////////
 	$scope.uploads = [];
 	$rootScope.$on('upload',function($onScope,files){
 		console.log('upload',arguments); // log
@@ -293,15 +305,14 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		console.log('uploadComplete',oResponse); // log
 		if (oResponse.success) {
 			oResponse.data.forEach(function(file){
-				$scope.files.push(file);
 				$scope.uploads.forEach(function(upfile,i){
 					if (file.name===upfile.name) {
 						$scope.uploads.splice(i,1);
+						$scope.files.push(file);
 					}
 				});
 			});
 			sortFiles();
-//			sortFiles();
 			$scope.$apply();
 		}
 	}
