@@ -1,6 +1,10 @@
-<div class="sfb sfb-modal" data-ng-controller="SfbController as sfb">
-	<div class="sfb-window sfb-{{sfb.layout}}" data-ng-controller="SfbWindowController">
-		<h3>SFBrowser</h3>
+<div class="sfb sfb-modal" data-ng-controller="SfbController as sfb" data-sfb-resize>
+	<div
+		class="sfb-window sfb-{{sfb.layout}}"
+		data-ng-controller="SfbWindowController as sfbwin"
+		ng-style="{left:sfbwin.windowModel.x}"
+	>
+		<h3>SFBrowser {{sfbwin.windowModel.x}} {{sfbwin.windowModel.y}}</h3>
 		<div class="sfb-window-buttons">
 			<button data-ng-click="sfb.fullscreen()" class="icon-expand"></button>
 			<button data-ng-click="sfb.close()"		 class="icon-close"></button>
@@ -11,14 +15,14 @@
 			<button data-ng-click="sfb.close()" class="btn btn-default btn-sm">Cancel</button>
 			<button data-ng-click="sfb.select()" class="btn btn-primary btn-sm">Select</button>
 		</div>
-		<div class="sfb-move"		draggable="move"></div>
-		<div class="sfb-resize-l"	draggable="resize-l"></div>
-		<div class="sfb-resize-r"	draggable="resize-r"></div>
-		<div class="sfb-resize-t"	draggable="resize-t"></div>
-		<div class="sfb-resize-b"	draggable="resize-b"></div>
-		<div class="sfb-resize-tl"	draggable="resize-tl"></div>
-		<div class="sfb-resize-tr"	draggable="resize-tr"></div>
-		<div class="sfb-resize-bl"	draggable="resize-bl"></div>
-		<div class="sfb-resize-br"	draggable="resize-br"></div>
+		<div class="sfb-move"		data-sfb-drag="move"></div>
+		<div class="sfb-resize-l"	data-sfb-drag="resize-l"></div>
+		<div class="sfb-resize-r"	data-sfb-drag="resize-r"></div>
+		<div class="sfb-resize-t"	data-sfb-drag="resize-t"></div>
+		<div class="sfb-resize-b"	data-sfb-drag="resize-b"></div>
+		<div class="sfb-resize-tl"	data-sfb-drag="resize-tl"></div>
+		<div class="sfb-resize-tr"	data-sfb-drag="resize-tr"></div>
+		<div class="sfb-resize-bl"	data-sfb-drag="resize-bl"></div>
+		<div class="sfb-resize-br"	data-sfb-drag="resize-br"></div>
 	</div>
 </div>

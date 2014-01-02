@@ -201,7 +201,6 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 					file.dimensions = bWH?(file.width+' x '+file.height):'';
 					file.sizeFormatted = file.type!=='dir'?formatSize(file.size):'';
 					file.nameEditing = false;
-					console.log('file.editName',file.editName); // log
 
 				});
 				$scope.files = result.data;
