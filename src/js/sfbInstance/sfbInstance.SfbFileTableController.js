@@ -1,30 +1,60 @@
-angular.module('sfbInstance').controller('sfbFileTableController',function($scope,$rootScope,SfbFilesModel,$element,callback,Key) {
+angular.module('sfbInstance').controller('sfbFileTableController',function(
+		$scope
+		,$rootScope
+		,SfbFilesModel
+		,$element
+		,callback
+		,Key
+		,SfbWindowModel
+	){
 	'use strict';
+
+	// local variables
 	var mElement = $element[0]
 		,mScroll = mElement.querySelector('.scroll')
+		,mMoveFiles = mElement.querySelector('.move-files')
 		,aTables = mElement.querySelectorAll('table')
 		,aHeadTd = aTables[0].querySelector('tr').children
 		,aBodyTd
 		,oFileLastClicked
 	;
 
-	setFolder();
+	// bindings
+
+	Key.keyUp(handleKeyUp);
 
 	$rootScope.$on('heightChanged',handleHeightChanged);
 	$rootScope.$on('widthChanged',handleWidthChanged);
+	$rootScope.$on('move-files-start',handleMoveFilesStart);
 	$rootScope.$on('move-files',handleMoveFiles);
-	$rootScope.$on('selectFiles',selectFiles);
-	Key.keyUp(handleKeyUp);
+	$rootScope.$on('move-files-end',handleMoveFilesEnd);
+	$rootScope.$on('selectFiles',handleSelectFiles);
+	$rootScope.$on('upload',handleUpload);
 
-	$scope.handleFileKeyUp = function(e){
+	$scope.fileKeyUp = handleFileKeyUp;
+	$scope.trClick = handleTrClick;
+	$scope.trDblClick = handleTrDblClick;
+	$scope.cancelUpload = SfbFilesModel.abortUpload;
+	$scope.deleteFile = handleDeleteFile;
+	$scope.sortBy = handleSortBy;
+	$scope.iconPos = handleIconPosition;
+
+	// set scope variables
+
+	$scope.uploads = SfbFilesModel.uploads;
+	setFolder(); // sets $scope.files
+	$scope.moveFiles = [];
+
+	// functions
+
+	function handleFileKeyUp(e){
 		if (e.keyCode===Key.RETURN) {
 			renameFile(e.target);
 		}
-	};
-	$scope.handleTrClick = function(e,file){
-		var mCurrentTarget = e.currentTarget
-			,mTarget = e.target;
-		console.log('handleTrClick',file.selected,mTarget.nodeName,mCurrentTarget.nodeName); // log
+	}
+
+	function handleTrClick(e,file){
+		var mTarget = e.target;
 		checkEnabledInputs();
 		if (!Key[Key.CTRL]) clearSelected(file);
 		if (Key[Key.SHIFT]&&oFileLastClicked) {
@@ -45,23 +75,18 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 			if (!file.selected) oFileLastClicked = null;
 		}
 		oFileLastClicked = file;
-	};
-	$scope.handleTrDblClick = function(file){
+	}
+
+	function handleTrDblClick(file){
 		file.selected = true;
 		if (file.type==='dir') {
 			setFolder(file.name);
 		} else {
-			selectFiles();
-//			var aSelected = [];
-//			$scope.files.forEach(function(file){
-//				if (file.selected) {
-//					aSelected.push(file);
-//				}
-//			});
-//			callback(aSelected);
+			handleSelectFiles();
 		}
-	};
-	function selectFiles(){
+	}
+
+	function handleSelectFiles(){
 		var aSelected = [];
 		$scope.files.forEach(function(file){
 			if (file.selected) {
@@ -71,14 +96,8 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		callback(aSelected);
 		$rootScope.$emit('close');
 	}
-	/*$scope.getDownloadLink = function(file){
-		var mA = document.createElement('a');
-		mA.innerText = 'download';
-		mA.href = sCurrentFolder+file.name;
-		mA.download = file.name;
-		return mA;
-	};*/
-	$scope.deleteFile = function(file){
+
+	function handleDeleteFile(file){
 		if (file.type==='dir') {
 			console.log('todo rem dir'); // todo: rem dir
 		} else {
@@ -86,8 +105,8 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 				if (success) $scope.$apply();
 			});
 		}
-	};
-	$scope.sortBy = function(e){
+	}
+	function handleSortBy(e){
 		var mCTarget = e.currentTarget
 			,aTh = mCTarget.childNodes
 			,mTarget = e.target
@@ -100,16 +119,18 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 			mSibl.classList.remove('sortasc');
 			mSibl.classList.remove('sortdesc');
 		}
-		//console.log('mTarget.siblings',mTarget.siblings); // log
 		aTClassList.add(bDesc?'sortdesc':'sortasc');
 		if (sSortBy) sortFiles(sSortBy,bDesc);
-	};
+	}
+
 	/**
-	 * Calculate icon offset
+	 * Calculate icon offset by extension
 	 * @param file
 	 * @returns {string}
 	 */
-	$scope.icon = function(file){ // todo: check http://www.mailbigfile.com/101-most-popular-file-types/
+	function handleIconPosition(file){
+		// todo: check http://www.mailbigfile.com/101-most-popular-file-types/
+		// todo: move position check to model and memoize
 		var iHo = file.ext.charCodeAt(0)-97;
 		var iVo = file.ext.charCodeAt(1)-97;
 		switch (file.type) {
@@ -125,12 +146,14 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 		iVo *= -16;
 		// file td
 		return 'background-position:'+iHo+'px '+iVo+'px;';
-	};
+	}
+
 	function checkEnabledInputs(){
 		$scope.files.forEach(function(file){
 			renameFile(file);
 		});
 	}
+
 	function clearSelected(except){
 		var aFiles = $scope.files;
 		for (var i=0,l=aFiles.length;i<l;i++){
@@ -189,9 +212,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 	function handleHeightChanged($targetScope,h){
 		mScroll.style.height = (h-85)+'px';
 	}
-	function handleMoveFiles($targetScope,x,y){
-		console.log('move-files',$targetScope,x,y); // log
-	}
+
 	function handleKeyUp(keyCode){
 		if (keyCode===Key.RETURN) {
 			// todo: select file/folder and possibly close
@@ -204,14 +225,8 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 
 		}
 	}
-	/////////////////////////////////////////////
-	/////////////////////////////////////////////
-	/////////////////////////////////////////////
-	/////////////////////////////////////////////
-	/////////////////////////////////////////////
-	$scope.uploads = SfbFilesModel.uploads;
 
-	$rootScope.$on('upload',function($onScope,files){
+	function handleUpload($onScope,files){
 		SfbFilesModel.uploadFiles(files,function(){
 			setTimeout(function(){$scope.$apply();},40);
 		},function(success){
@@ -221,8 +236,45 @@ angular.module('sfbInstance').controller('sfbFileTableController',function($scop
 			$scope.$apply();
 		});
 		$scope.$apply();
-	});
-	$scope.cancelUpload = function(file){
-		SfbFilesModel.abortUpload(file);
-	};
+	}
+
+	function handleMoveFilesStart($targetScope,x,y,startElement){
+		console.log('move-files-start',$targetScope,x,y); // log
+		console.log('$scope.moveFiles.length',$targetScope); // log
+		$scope.files.forEach(function(file){
+			if (file.selected) $scope.moveFiles.push(file);
+		});
+		if ($scope.moveFiles.length===0) {
+			var $StartTr = angular.element(findParentType(startElement,'TR'));
+			$scope.moveFiles.push($StartTr.controller('ngModel').$modelValue);
+		}
+		$scope.$apply();
+	}
+	function handleMoveFiles($targetScope,x,y){
+		mMoveFiles.style.left	= (x-SfbWindowModel.x)+'px';
+		mMoveFiles.style.top	= (y-SfbWindowModel.y)+'px';
+	}
+	function handleMoveFilesEnd($targetScope,x,y,target){
+		console.log('handleMoveFilesEnd'); // log
+		var mTargetTr = findParentType(target,'TR')
+			,aMoveFiles = $scope.moveFiles.slice(0)
+			,oTargetFile;
+		if (aMoveFiles.length>0) {
+			oTargetFile = angular.element(mTargetTr).controller('ngModel').$modelValue;
+			SfbFilesModel.moveFiles($scope.moveFiles.slice(0),oTargetFile,function(success){
+				if (success) $scope.$apply();
+			});
+		}
+		$scope.moveFiles.length = 0;
+		$scope.$apply();
+	}
+
+	function findParentType(element,type){
+		var mFound = element;
+		while (mFound.parentNode&&mFound.nodeName!==type) {
+			mFound = mFound.parentNode;
+		}
+		return mFound;
+	}
+
 });

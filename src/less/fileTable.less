@@ -145,12 +145,30 @@
 					content: '';
 					.square(16px);
 					.lt(3,1);
+					/*! include -b fileSheet.png */
 					background-position: inherit;
 				}
 			}
 			&.smaller {
 				font-size: 10px;
 				vertical-align: bottom;
+			}
+		}
+	}
+	.move-files {
+		position: absolute;
+//		display: none;
+		width: auto;
+		z-index: 10;
+		.box-shadow(2px 2px 8px fade(black,30%));
+		&,*{
+			pointer-events: none;
+		}
+		tbody {
+			background-color: @colorHover;
+			tr {
+				background-color: transparent;
+				border: 0;
 			}
 		}
 	}

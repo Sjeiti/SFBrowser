@@ -27,15 +27,15 @@
 				<td><button data-ng-click="cancelUpload(file)" class="icon-close"><span>delete</span></button></td>
 			</tr>
 			<tr
-				data-ng-click="handleTrClick($event,file)"
-				data-ng-dblclick="handleTrDblClick(file)"
+				data-ng-click="trClick($event,file)"
+				data-ng-dblclick="trDblClick(file)"
 				data-ng-repeat="file in files"
 				data-ng-model="file"
 				data-sfb-drag="move-files"
 				class="{{file.selected?'selected':''}}"
 			>
-				<td style="{{icon(file)}}"><input type="text"
-					data-ng-keyup="handleFileKeyUp($event)"
+				<td style="{{iconPos(file)}}"><input type="text"
+					data-ng-keyup="fileKeyUp($event)"
 					data-ng-model="file.name"
 					data-ng-disabled="!file.nameEditing"
 				/></td>
@@ -49,6 +49,19 @@
 						<button data-ng-click="deleteFile(file)" class="icon-remove"><span>delete</span></button>
 					</div>
 				</td>
+			</tr>
+			</tbody>
+		</table>
+		<table class="move-files">
+			<tbody>
+			<tr
+				data-ng-repeat="file in moveFiles"
+				data-ng-model="file"
+			>
+				<td style="{{iconPos(file)}}"><input type="text"
+					data-ng-model="file.name"
+					data-ng-disabled="true"
+				/></td>
 			</tr>
 			</tbody>
 		</table>

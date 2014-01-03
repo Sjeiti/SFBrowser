@@ -10,6 +10,7 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(Api) {
 			,getList: getList
 			,deleteFile: deleteFile
 			,renameFile: renameFile
+			,moveFiles: moveFiles
 			,uploadFiles: uploadFiles
 			,abortUpload: abortUpload
 		}
@@ -27,6 +28,7 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(Api) {
 					file.dimensions = bWH?(file.width+' x '+file.height):'';
 					file.sizeFormatted = file.type!=='dir'?formatSize(file.size):'';
 					file.nameEditing = false;
+					file.selected = false;
 
 				});
 				aCurrentList = result.data;
@@ -64,6 +66,32 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(Api) {
 				}
 				callback(result.success);
 			});
+		}
+	}
+	function moveFiles(files,target,callback){
+		if (target.type==='dir') {
+			if (files.indexOf(target)===-1) {
+//				SfbFilesModel
+				var aFiles = [];
+				files.forEach(function(file){
+					aFiles.push(encodeURIComponent(file.name));
+				});
+				Api.move({
+					target: encodeURIComponent(oReturn.currentFolder+'/'+target.name)
+					,current:encodeURIComponent(oReturn.currentFolder)
+					,files:aFiles//.join('/')
+				},function(result) {
+					if (result.success) {
+						files.forEach(function(file){
+							var iIndex = aCurrentList.indexOf(file);
+							aCurrentList.splice(iIndex,1);
+						});
+					}
+					callback(result.success);
+				});
+			} else {
+				console.log('cannot move inside itself'); // log
+			}
 		}
 	}
 	function uploadFiles(files,progress,complete){

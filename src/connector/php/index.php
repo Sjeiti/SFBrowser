@@ -64,7 +64,29 @@ class SfBrowser {
 			echo json_encode($this->aResponse);
 		});
 
-		$app->post('/upload/:folder', function($folder) {
+		$app->post('/move/:target/:current/:files', function($target,$current,$files) {
+			$sTarget = urldecode($target);
+			$sCurrent = urldecode($current);
+			$aFiles = explode(',',urldecode($files));
+			if (
+				$this->notError($this->withinRoot($sTarget),"Invalid path: '$sTarget' not in root folder")
+				&&$this->notError($this->withinRoot($sCurrent),"Invalid path: '$sCurrent' not in root folder")
+			){
+				foreach ($aFiles as $file) {
+					$sCurrentFile = $sCurrent.'/'.$file;
+					$sToFile = $sTarget.'/'.$file;
+					if (
+						$this->notError(file_exists($sCurrentFile),"The file '$file' does not exist")
+						&&$this->notError(rename($sCurrentFile,$sToFile),"The file '$file' could not be moved")
+					) {
+						$this->aResponse['success'] = true;
+					}
+				}
+			}
+			echo json_encode($this->aResponse);
+		});
+
+/*		$app->post('/upload/:folder', function($folder) {
 			$sFolder = urldecode($folder);
 			//
 			$this->aResponse['data'] = $sFolder;
@@ -81,7 +103,7 @@ class SfBrowser {
 //				$this->aResponse['data'] = $sFile.' => '.$sFileTo;
 //			}
 			echo json_encode($this->aResponse);
-		});
+		});*/
 
 		$app->post('/upload', function() {
 //			$this->aResponse['numFiles'] = count($_FILES);
