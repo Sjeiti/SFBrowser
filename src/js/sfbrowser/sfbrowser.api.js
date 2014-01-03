@@ -1,5 +1,6 @@
 angular.module('sfbrowser').factory('Api',function($resource){
 	'use strict';
+	// todo: see: http://blog.brunoscopelliti.com/authentication-to-a-restful-web-service-in-an-angularjs-web-app
 	var sUriAPI = 'connector/php'
 		,sBase = encodeURIComponent('../../data/');
 	return $resource(sUriAPI,{},{
@@ -28,13 +29,23 @@ angular.module('sfbrowser').factory('Api',function($resource){
 				,to:'@to'
 			}
 		}
-		,upload: {
+		,move: {
+			url: sUriAPI+'/move/:base:target/:base:current/:files'
+			,method: 'POST'
+			, params:{
+				base:sBase
+				,target:'@target'
+				,current:'@current'
+				,files:'@files'
+			}
+		}
+		/*,upload: {
 			url: sUriAPI+'/upload/:base:folder'
 			,method: 'POST'
 			, params:{
 				base:sBase
 				,folder:'@folder'
 			}
-		}
+		}*/
 	});
 });

@@ -148,60 +148,6 @@ angular.module('sfbInstance').controller('sfbFileTableController',function(
 		return 'background-position:'+iHo+'px '+iVo+'px;';
 	}
 
-	function checkEnabledInputs(){
-		$scope.files.forEach(function(file){
-			renameFile(file);
-		});
-	}
-
-	function clearSelected(except){
-		var aFiles = $scope.files;
-		for (var i=0,l=aFiles.length;i<l;i++){
-			var file = aFiles[i];
-			if (file!==except) file.selected = false;
-		}
-	}
-	function renameFile(file){
-		if (file.nameEditing) {
-			file.nameEditing = false;
-			SfbFilesModel.renameFile(file,function(success){
-				if (!success) $scope.$apply();
-			});
-		}
-	}
-	function setFolder(folder){
-		console.log('setFolder',folder); // log
-		SfbFilesModel.getList(folder,function(list){
-			$scope.files = list;
-			sortFiles();
-			$scope.$apply();
-			aBodyTd = aTables[1].querySelector('tr').children;
-			handleWidthChanged();
-		});
-	}
-	function sortFiles(by,bDesc){
-		console.log('sortFiles',by); // log
-		if (by===undefined) by = 'name';
-		var iAscDesc = bDesc?-1:1;
-		$scope.files.sort(function(a,b){
-			if ((a.type==='dir'&&b.type!=='dir')||a.name==='..') {
-				return -1;
-			} if ((a.type!=='dir'&&b.type==='dir')||b.name==='..') {
-				return 1;
-			} else {
-				var sA = a[by]
-					,sB = b[by];
-				if (sA===undefined) return 1;
-				else if (sB===undefined) return -1;
-				if (sA&&sA.toLowerCase) sA = sA.toLowerCase();
-				if (sB&&sB.toLowerCase) sB = sB.toLowerCase();
-				if (sA>sB) return iAscDesc;
-				if (sA<sB) return -iAscDesc;
-				return 0;
-			}
-		});
-	}
-
 	function handleWidthChanged(){
 		if (aBodyTd) {
 			for (var i=0,l=aBodyTd.length-1;i<l;i++) {
@@ -239,8 +185,6 @@ angular.module('sfbInstance').controller('sfbFileTableController',function(
 	}
 
 	function handleMoveFilesStart($targetScope,x,y,startElement){
-		console.log('move-files-start',$targetScope,x,y); // log
-		console.log('$scope.moveFiles.length',$targetScope); // log
 		$scope.files.forEach(function(file){
 			if (file.selected) $scope.moveFiles.push(file);
 		});
@@ -255,7 +199,6 @@ angular.module('sfbInstance').controller('sfbFileTableController',function(
 		mMoveFiles.style.top	= (y-SfbWindowModel.y)+'px';
 	}
 	function handleMoveFilesEnd($targetScope,x,y,target){
-		console.log('handleMoveFilesEnd'); // log
 		var mTargetTr = findParentType(target,'TR')
 			,aMoveFiles = $scope.moveFiles.slice(0)
 			,oTargetFile;
@@ -267,6 +210,58 @@ angular.module('sfbInstance').controller('sfbFileTableController',function(
 		}
 		$scope.moveFiles.length = 0;
 		$scope.$apply();
+	}
+
+	function checkEnabledInputs(){
+		$scope.files.forEach(function(file){
+			renameFile(file);
+		});
+	}
+
+	function clearSelected(except){
+		var aFiles = $scope.files;
+		for (var i=0,l=aFiles.length;i<l;i++){
+			var file = aFiles[i];
+			if (file!==except) file.selected = false;
+		}
+	}
+	function renameFile(file){
+		if (file.nameEditing) {
+			file.nameEditing = false;
+			SfbFilesModel.renameFile(file,function(success){
+				if (!success) $scope.$apply();
+			});
+		}
+	}
+	function setFolder(folder){
+		SfbFilesModel.getList(folder,function(list){
+			$scope.files = list;
+			sortFiles();
+			$scope.$apply();
+			aBodyTd = aTables[1].querySelector('tr').children;
+			handleWidthChanged();
+		});
+	}
+	function sortFiles(by,bDesc){
+		if (by===undefined) by = 'name';
+		var iAscDesc = bDesc?-1:1;
+		$scope.files.sort(function(a,b){
+			if ((a.type==='dir'&&b.type!=='dir')||a.name==='..') {
+				return -1;
+			} if ((a.type!=='dir'&&b.type==='dir')||b.name==='..') {
+				return 1;
+			} else {
+				var sA = a[by]
+					,sB = b[by];
+				if (sA===undefined) return 1;
+				else if (sB===undefined) return -1;
+				if (sA&&sA.toLowerCase) sA = sA.toLowerCase();
+				if (sB&&sB.toLowerCase) sB = sB.toLowerCase();
+				if (sA>sB) return iAscDesc;
+				if (sA<sB) return -iAscDesc;
+				return 0;
+			}
+		});
 	}
 
 	function findParentType(element,type){
