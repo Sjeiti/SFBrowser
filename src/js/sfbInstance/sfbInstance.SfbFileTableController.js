@@ -174,15 +174,25 @@ angular.module('sfbInstance').controller('sfbFileTableController',function(
 
 	function handleUpload($onScope,files){
 		if (files.length) {
-			SfbFilesModel.uploadFiles(files,function(){
-				setTimeout(function(){$scope.$apply();},40);
-			},function(success){
-				if (success) {
-					sortFiles();
+			var	aFilesNormalize = []
+				,bOverwriting = false;
+			Array.prototype.forEach.apply(files,[function(file){
+				aFilesNormalize.push(file.name);
+			}]);
+			$scope.files.forEach(function(file){
+				if (aFilesNormalize.indexOf(file.name)!==-1) {
+					bOverwriting = true;
 				}
-				$scope.$apply();
 			});
-			$scope.$apply();
+			if (!bOverwriting||confirm('Some files will be overwritten. Proceed?')) {
+				SfbFilesModel.uploadFiles(files,function(){
+					setTimeout(function(){$scope.$apply();},40);
+				},function(success){
+					success&&sortFiles();
+					$scope.$apply();
+				});
+				$scope.$apply();
+			}
 		}
 	}
 

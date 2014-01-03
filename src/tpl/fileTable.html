@@ -52,18 +52,18 @@
 			</tr>
 			</tbody>
 		</table>
-		<table class="move-files">
-			<tbody>
-			<tr
-				data-ng-repeat="file in moveFiles"
-				data-ng-model="file"
-			>
-				<td style="{{iconPos(file)}}"><input type="text"
-					data-ng-model="file.name"
-					data-ng-disabled="true"
-				/></td>
-			</tr>
-			</tbody>
-		</table>
 	</div>
+	<table class="move-files">
+		<tbody>
+		<tr
+			data-ng-repeat="file in moveFiles"
+			data-ng-model="file"
+		>
+			<td style="{{iconPos(file)}}"><input type="text"
+				data-ng-model="file.name"
+				data-ng-disabled="true"
+			/></td>
+		</tr>
+		</tbody>
+	</table>
 </div>
