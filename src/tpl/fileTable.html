@@ -40,9 +40,9 @@
 					data-ng-disabled="!file.nameEditing"
 				/></td>
 				<td>{{file.ext}}</td>
-				<td>{{file.time*1000|date:'yyyy-MM-dd'}}</td>
+				<td class="smaller">{{file.time*1000|date:'yyyy-MM-dd'}}</td>
 				<td>{{file.sizeFormatted}}</td>
-				<td>{{file.dimensions}}</td>
+				<td class="smaller">{{file.dimensions}}</td>
 				<td>
 					<div ng-if="file.type==='file'">
 						<a href="{{file.path+'/'+file.name}}" download="{{file.name}}" class="icon-download"><span>download</span></a>
