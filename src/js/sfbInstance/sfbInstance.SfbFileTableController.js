@@ -173,15 +173,17 @@ angular.module('sfbInstance').controller('sfbFileTableController',function(
 	}
 
 	function handleUpload($onScope,files){
-		SfbFilesModel.uploadFiles(files,function(){
-			setTimeout(function(){$scope.$apply();},40);
-		},function(success){
-			if (success) {
-				sortFiles();
-			}
+		if (files.length) {
+			SfbFilesModel.uploadFiles(files,function(){
+				setTimeout(function(){$scope.$apply();},40);
+			},function(success){
+				if (success) {
+					sortFiles();
+				}
+				$scope.$apply();
+			});
 			$scope.$apply();
-		});
-		$scope.$apply();
+		}
 	}
 
 	function handleMoveFilesStart($targetScope,x,y,startElement){
@@ -189,8 +191,10 @@ angular.module('sfbInstance').controller('sfbFileTableController',function(
 			if (file.selected) $scope.moveFiles.push(file);
 		});
 		if ($scope.moveFiles.length===0) {
-			var $StartTr = angular.element(findParentType(startElement,'TR'));
-			$scope.moveFiles.push($StartTr.controller('ngModel').$modelValue);
+			var	mStartTr = findParentType(startElement,'TR');
+			if (mStartTr!==null) {
+				$scope.moveFiles.push(angular.element(mStartTr).controller('ngModel').$modelValue);
+			}
 		}
 		$scope.$apply();
 	}
@@ -202,7 +206,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function(
 		var mTargetTr = findParentType(target,'TR')
 			,aMoveFiles = $scope.moveFiles.slice(0)
 			,oTargetFile;
-		if (aMoveFiles.length>0) {
+		if (mTargetTr!==null&&aMoveFiles.length>0) {
 			oTargetFile = angular.element(mTargetTr).controller('ngModel').$modelValue;
 			SfbFilesModel.moveFiles($scope.moveFiles.slice(0),oTargetFile,function(success){
 				if (success) $scope.$apply();
@@ -269,7 +273,7 @@ angular.module('sfbInstance').controller('sfbFileTableController',function(
 		while (mFound.parentNode&&mFound.nodeName!==type) {
 			mFound = mFound.parentNode;
 		}
-		return mFound;
+		return mFound.nodeName===type?mFound:null;
 	}
 
 });
