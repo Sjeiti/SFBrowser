@@ -34,9 +34,11 @@
 	text-rendering: optimizeLegibility;
 	[class^="icon-"], [class*=" icon-"] {
 		margin: 0;
-		padding: 0;
+//		padding: 0;
 		border: 0;
-		font-size: 16px;
+//		font-size: 16px;
+			padding: 2px 1px;
+			font-size: 12px;
 		color: @colorSfb;
 		background-color: transparent;
 		&:hover {
@@ -75,7 +77,7 @@
 		.lt(100,100,fixed);
 		z-index: 1;
 		.mindim(200,200);
-		padding: 10px;
+		padding: 0 10px 10px;
 		.border-radius(4);
 		background: @colorWindowFade;
 		.box-shadow(@windowShadow);
@@ -92,8 +94,8 @@
 		.rt(1,-2);
 		z-index: 1;
 		button {
-			padding: 2px;
-			font-size: 12px;
+//			padding: 2px;
+//			font-size: 12px;
 		}
 	}
 	// move and resize elements
@@ -149,11 +151,22 @@
 	// modal background
 	&.sfb-modal {
 		&:before {
-			content: 'qwre';
+			content: '';
 			display: block;
 			.square(100%);
 			.lt(0,0,fixed);
 			background: @colorModal;
+		}
+	}
+}
+
+/* phones and tablets */
+@media only screen
+and (min-device-width : 0px)
+and (max-device-width : 1024px) {
+	.sfb {
+		[class^="icon-"], [class*=" icon-"] {
+			font-size: 36px;
 		}
 	}
 }

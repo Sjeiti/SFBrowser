@@ -194,6 +194,79 @@ module.exports = function (grunt) {
 			}
 		}
 
+		,'ftp-deploy': {
+			build: {
+				auth: {
+					host: 'ftp.dds.nl',
+					port: 21,
+					authKey: 'dds'
+				},
+				src: 'dist',
+				dest: '/public_html/sub/sfbrowser/test',
+				exclusions: []
+			}
+			,css: {
+				auth: {
+					host: 'ftp.dds.nl',
+					port: 21,
+					authKey: 'dds'
+				},
+				src: 'dist/css',
+				dest: '/public_html/sub/sfbrowser/test/css',
+				exclusions: []
+			}
+		}
+
+		,rsync: {
+			options: {
+				args: ["--verbose"],
+				exclude: [".git*","*.scss","node_modules"],
+				recursive: true
+			},
+			ddd: {
+				options: {
+					src: '/dist',
+					dest: '/public_html/sub/sfbrowser/test',
+						host: 'sjeiti@shell.dds.nl',
+					port: 22,
+					ssh: true,
+					dryRun: true,
+					syncDestIgnoreExcl: true
+				}
+			},
+			dist: {
+				options: {
+					src: 'dist',
+					dest: '/public_html/sub/sfbrowser/test',
+					host: 'sjeiti@ftp.dds.nl',
+					dryRun: true,
+					syncDestIgnoreExcl: true
+				}
+			}/*,
+			ddist: {
+				options: {
+					src: "./",
+					dest: "../dist"
+				}
+			},
+			stage: {
+				options: {
+					src: "../dist/",
+					dest: "/var/www/site",
+					host: "user@staging-host",
+					syncDestIgnoreExcl: true
+				}
+			},
+			prod: {
+				options: {
+					src: "../dist/",
+					dest: "/var/www/site",
+					host: "user@live-host",
+					syncDestIgnoreExcl: true
+				}
+			}*/
+		}
+
 	});
 
 	// todo: grunt-include-all
@@ -275,9 +348,17 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-less');
+	grunt.loadNpmTasks('grunt-ftp-deploy');
+	grunt.loadNpmTasks('grunt-rsync');
 
-	grunt.registerTask('default',['jshint','uglify']);
-	grunt.registerTask('dev',['includejs:temp','copy:temp']);
+	grunt.registerTask('default',[
+		'jshint'
+		,'uglify'
+	]);
+	grunt.registerTask('dev',[
+		'includejs:temp'
+		,'copy:temp'
+	]);
 	grunt.registerTask('dist',[
 		'clean:dist'
 		,'copy:dist'
@@ -288,9 +369,15 @@ module.exports = function (grunt) {
 		,'wrapconcat:dist'
 		,'uglify:dist'
 	]);
-
-
-	grunt.registerTask('css',['less:dev','includejs:temp','copy:temp']);
-	grunt.registerTask('tpl',['wrapconcat','includejs:temp','copy:temp']);
+	grunt.registerTask('css',[
+		'less:dev'
+		,'includejs:temp'
+		,'copy:temp'
+	]);
+	grunt.registerTask('tpl',[
+		'wrapconcat'
+		,'includejs:temp'
+		,'copy:temp'
+	]);
 
 };
