@@ -2,11 +2,11 @@
 	<table>
 		<thead>
 		<tr data-ng-click="sortBy($event)">
-			<th data-type="name">name</th>
-			<th data-type="ext">type</th>
-			<th data-type="time">date</th>
-			<th data-type="size">size</th>
-			<th data-type="surface">dimensions</th>
+			<th data-type="name" translate="name">name</th>
+			<th data-type="ext" translate="type">type</th>
+			<th data-type="time" translate="date">date</th>
+			<th data-type="size" translate="size">size</th>
+			<th data-type="surface" translate="dimensions">dimensions</th>
 			<th></th>
 		</tr>
 		</thead>
@@ -45,8 +45,8 @@
 				<td class="smaller">{{file.dimensions}}</td>
 				<td>
 					<div ng-if="file.type==='file'">
-						<a href="{{file.path+'/'+file.name}}" download="{{file.name}}" class="icon-download"><span>download</span></a>
-						<button data-ng-click="deleteFile(file)" class="icon-remove"><span>delete</span></button>
+						<a href="{{file.path+'/'+file.name}}" download="{{file.name}}" class="icon-download" title="{{'download'|translate}}"></a>
+						<button data-ng-click="deleteFile(file)" class="icon-remove" title="{{'delete'|translate}}"></button>
 					</div>
 				</td>
 			</tr>

@@ -32,6 +32,8 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 	// and proceed...
 	function initModule(){
 		var oSFB = {};
+
+		/*include vendor/angular-translate.min.js*/
 		/*include sfbrowser/sfbrowser.js*/
 		angular.bootstrap(oSFB, ['sfbrowser']);
 		oSFBInjector = angular.element(oSFB).injector();

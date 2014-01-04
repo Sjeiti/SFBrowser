@@ -5,14 +5,14 @@
 	>
 		<h3>SFBrowser {{sfbwin.windowModel.x}} {{sfbwin.windowModel.y}}</h3>
 		<div class="sfb-window-buttons">
-			<button data-ng-click="sfb.fullscreen()" class="icon-expand"></button>
-			<button data-ng-click="sfb.close()"		 class="icon-close"></button>
+			<button data-ng-click="sfb.fullscreen()" class="icon-expand" title="{{'fullscreen'|translate}}"></button>
+			<button data-ng-click="sfb.close()"		 class="icon-close" title="{{'close'|translate}}"></button>
 		</div>
 		<ng-include src="sfb.menuMain"></ng-include>
 		<ng-include src="sfb.fileTable"></ng-include>
 		<div class="select">
-			<button data-ng-click="sfb.close()" class="btn btn-default btn-sm">Cancel</button>
-			<button data-ng-click="sfb.select()" class="btn btn-primary btn-sm">Select</button>
+			<button data-ng-click="sfb.close()" translate="cancel" class="btn btn-default btn-sm">Cancel</button>
+			<button data-ng-click="sfb.select()" translate="select" class="btn btn-primary btn-sm">Select</button>
 		</div>
 		<div class="sfb-move"		data-sfb-drag="move"></div>
 		<div class="sfb-resize-l"	data-sfb-drag="resize-l"></div>
