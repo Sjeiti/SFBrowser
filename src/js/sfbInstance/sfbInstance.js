@@ -8,31 +8,13 @@ angular.module('sfbInstance',['ngAnimate','pascalprecht.translate'])
 		angular.forEach(angular.extend({
 			directory:''
 			,callback: function(files){console.log(files);}
-		},/*options*/{}),function(value,key) {
+		},/*todo:options*/{}),function(value,key) {
 			$provide.value(key,value);
 		});
-		$translateProvider.translations({
-			// window buttons
-			fullscreen: 'fullscreen'
-			,close: 'close'
-			// main menu
-			,newFolder: 'new folder'
-			,upload: 'upload'
-			,grid: 'grid'
-			,settings: 'settings'
-			// buttons below
-			,select: 'Select'
-			,cancel: 'Cancel'
-			// table header
-			,name: 'name'
-			,type: 'type'
-			,date: 'date'
-			,size: 'size'
-			,dimensions: 'dimensions'
-			// item tr
-			,download: 'download'
-			,delete: 'delete'
-		});
+		/*include ../../lang/en.js*/
+		/*include ../../lang/nl.js*/
+		$translateProvider.preferredLanguage('en');
+
 	})
 ;
 /*include sfbInstance.SfbController.js*/
@@ -41,6 +23,7 @@ angular.module('sfbInstance',['ngAnimate','pascalprecht.translate'])
 /*include sfbInstance.SfbWindowController.js*/
 /*include sfbInstance.SfbMenuController.js*/
 /*include sfbInstance.SfbFileTableController.js*/
+/*include sfbInstance.SfbSettingsController.js*/
 /*include sfbInstance.SfbDragDirective.js*/
 /*include sfbInstance.SfbResizeDirective.js*/
 /*include sfbInstance.SfbFileDropDirective.js*/

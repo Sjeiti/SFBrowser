@@ -1,4 +1,4 @@
-angular.module('sfbInstance').controller('sfbFileTableController',function(
+angular.module('sfbInstance').controller('SfbFileTableController',function(
 		$scope
 		,$rootScope
 		,SfbFilesModel

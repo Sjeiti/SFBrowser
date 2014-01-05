@@ -4,6 +4,9 @@ angular.module('sfbInstance').controller('SfbController',function($scope,$rootSc
 	this.layout = 'list';
 	this.menuMain = 'menuMain.html';
 	this.fileTable = 'fileTable.html';
+	this.settings = 'settings.html';
+
+	this.page = 'files';
 
 	this.fullscreen = function(){
 		$rootScope.$emit('fullscreen');

@@ -1,0 +1,13 @@
+<div class="sfb-settings"
+	 data-ng-show="sfbwin.page=='settings'"
+	 data-ng-controller="SfbSettingsController as settings"
+>
+	<label>
+		{{'language'|translate}}
+		<select
+			name="lang"
+			data-ng-model="lang"
+			data-ng-options="lang.name for lang in settings.languages"
+		></select>
+	</label>
+</div>

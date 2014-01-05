@@ -1,6 +1,5 @@
 /* global module */
 /* global require */
-/* global Buffer */
 module.exports = function (grunt) {
 	/* jshint strict: false */
 
@@ -205,14 +204,14 @@ module.exports = function (grunt) {
 				dest: '/public_html/sub/sfbrowser/test',
 				exclusions: []
 			}
-			,css: {
+			,js: {
 				auth: {
 					host: 'ftp.dds.nl',
 					port: 21,
 					authKey: 'dds'
 				},
-				src: 'dist/css',
-				dest: '/public_html/sub/sfbrowser/test/css',
+				src: 'dist/js',
+				dest: '/public_html/sub/sfbrowser/test/js',
 				exclusions: []
 			}
 		}

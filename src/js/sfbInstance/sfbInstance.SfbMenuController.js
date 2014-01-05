@@ -1,4 +1,4 @@
-angular.module('sfbInstance').controller('sfbMenuController',function($scope,$rootScope) {
+angular.module('sfbInstance').controller('SfbMenuController',function($scope,$rootScope) {
 	'use strict';
 	$scope.filesView = function(){
 		$rootScope.$emit('view');

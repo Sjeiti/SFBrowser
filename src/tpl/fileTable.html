@@ -1,4 +1,7 @@
-<div class="sfb-filetable" data-ng-controller="sfbFileTableController">
+<div class="sfb-filetable"
+	data-ng-show="sfbwin.page===undefined?true:sfbwin.page=='files'"
+	data-ng-controller="SfbFileTableController"
+>
 	<table>
 		<thead>
 		<tr data-ng-click="sortBy($event)">
