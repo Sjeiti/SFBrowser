@@ -1,13 +1,13 @@
 /*global oSFBInjector*/
-angular.module('sfbInstance').factory( 'SfbFilesModel', function(config){
+angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 	'use strict';
 	var Api = oSFBInjector.get('Api') // we do not use require because sfbrowser must remain a singleton
-		,sBaseFolder = config.directory+'/'
+//		,sBaseFolder = ''
 		,aUploads = []
 		,bUploading = false
 		,aCurrentList
 		,oReturn = {
-			currentFolder: ''
+			currentFolder: SfbConfig.folder
 			,uploads: aUploads
 			,getList: getList
 			,deleteFile: deleteFile
@@ -18,28 +18,34 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(config){
 		}
 	;
 	function getList(folder,callback){
-		var sNewFolder = oReturn.currentFolder+'/'+(folder||'');
+		var sNewFolder = path(oReturn.currentFolder+'/'+(folder||''));
 		Api.list({folder:encodeURIComponent(sNewFolder)},function(result) {
 			if (result.success) {
+				aCurrentList = result.data;
 				oReturn.currentFolder = sNewFolder;
-				result.data.forEach(function(file){
+				var bIsRelativeRoot = oReturn.currentFolder===SfbConfig.folder
+					,aRemove = [];
+				aCurrentList.forEach(function(file){
 					var bWH = file.width&&file.height;
 					file.originalName = file.name;
-					file.path = sBaseFolder+oReturn.currentFolder;
+					file.path = oReturn.currentFolder;
 					file.surface = bWH?file.width*file.height:'';
 					file.dimensions = bWH?(file.width+' x '+file.height):'';
 					file.sizeFormatted = file.type!=='dir'?formatSize(file.size):'';
 					file.nameEditing = false;
 					file.selected = false;
-
+					if (bIsRelativeRoot&&file.type==='dir'&&file.name==='..'){
+						aRemove.push(file);
+					}
 				});
-				aCurrentList = result.data;
-				callback(result.data);
+				aRemove.forEach(function(file){
+					aCurrentList.splice(aCurrentList.indexOf(file),1);
+				});
+				callback(aCurrentList);
 			} else {
 				console.log('result.error',result.error); // todo: handle error
 			}
 		});
-
 	}
 	function deleteFile(file,callback){
 		Api.delete({file:encodeURIComponent(oReturn.currentFolder+'/'+file.name)},function(result) {
@@ -182,6 +188,16 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(config){
 		for (i = 0; size>1024 && (aSizes.length>=(i + 2)); i++) size /= 1024;
 		var iMult = Math.pow(10,round);
 		return (Math.round(size * iMult) / iMult) + aSizes[i];
+	}
+	function path(){
+		var sPath = Array.prototype.join.apply(arguments,['/'])
+			,sPath_;
+		while (sPath!==sPath_) {
+			sPath_ = n(sPath);
+			sPath = n(sPath_);
+		}
+		function n(s){return s.replace(/\/+/g,'/').replace(/\w+\/+\.\./g,'');}
+		return sPath.replace(/^\//,'').replace(/\/$/,'');
 	}
 	//
 	return oReturn;

@@ -1,7 +1,7 @@
 angular.module('sfbInstance').controller('SfbSettingsController',function(
 	$scope
 	,$translate
-	,SfbLocalStorageModel
+	,SfbConfig
 ) {
 	'use strict';
 	var oLanguages = {
@@ -15,12 +15,12 @@ angular.module('sfbInstance').controller('SfbSettingsController',function(
 		aLanguages.push(lang);
 	});
 	this.languages = aLanguages;
-	$scope.lang = oLanguages[SfbLocalStorageModel.get('lang')];
+	$scope.lang = oLanguages[SfbConfig.lang];
 	$translate.uses($scope.lang.iso);
 	$scope.$watch('lang',function(newVal,oldVal){
 		if (oldVal!==newVal) {
 			var sIso = newVal.iso;
-			SfbLocalStorageModel.save({lang:sIso});
+			SfbConfig.save({lang:sIso});
 			$translate.uses(sIso);
 		}
 	});

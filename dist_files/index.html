@@ -24,15 +24,14 @@
 	(function () {
 		document.querySelector('button').addEventListener('click',function(){
 			sfbrowser.init({
-				x: 10
-				,y: 10
+				folder: 'ImageFolder'
 			});
 		},false);
 		setTimeout(function(){
 			sfbrowser.init({
-				directory: 'data'
-				,x: 10
+				x: 10
 				,y: 10
+				,folder: ''
 				,lang: 'nl'
 				,callback: function(){
 					console.log('myCallback',arguments);

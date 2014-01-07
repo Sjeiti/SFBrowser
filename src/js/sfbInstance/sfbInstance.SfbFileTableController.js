@@ -4,7 +4,7 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 		,$rootScope
 		,SfbFilesModel
 		,$element
-		,config
+		,SfbConfig
 		,SfbWindowModel
 	){
 	'use strict';
@@ -110,7 +110,7 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 				aSelected.push(file);
 			}
 		});
-		config.callback(aSelected);
+		SfbConfig.callback(aSelected);
 		$rootScope.$emit('close');
 	}
 

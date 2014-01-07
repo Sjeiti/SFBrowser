@@ -1,6 +1,6 @@
 angular.module('sfbInstance').factory( 'SfbWindowModel', function(
 	$rootScope
-	,SfbLocalStorageModel
+	,SfbConfig
 ) {
 	'use strict';
 	var  xMax = 300
@@ -13,10 +13,10 @@ angular.module('sfbInstance').factory( 'SfbWindowModel', function(
 		,iLastW
 		,iLastH
 		,oReturn = {
-			 x: SfbLocalStorageModel.get('x')
-			,y: SfbLocalStorageModel.get('y')
-			,w: SfbLocalStorageModel.get('w')
-			,h: SfbLocalStorageModel.get('h')
+			 x: SfbConfig.x
+			,y: SfbConfig.y
+			,w: SfbConfig.w
+			,h: SfbConfig.h
 			,windowResize: windowResize
 			,drag: drag
 			,toggleFullscreen: toggleFullscreen
@@ -44,7 +44,7 @@ angular.module('sfbInstance').factory( 'SfbWindowModel', function(
 				resizeW(x);
 				resizeH(y);
 		}
-		SfbLocalStorageModel.save({
+		SfbConfig.save({
 			x: oReturn.x
 			,y: oReturn.y
 			,w: oReturn.w

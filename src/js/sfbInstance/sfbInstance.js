@@ -7,34 +7,22 @@ angular.module('sfbInstance',['ngAnimate','pascalprecht.translate'])
 		/*include ../../lang/nl.js*/
 		$translateProvider.preferredLanguage('en');
 	})
-	.value('config',{
-		directory: ''
-		,callback: function(files){
-			'use strict';
-			console.log(files);
-		}
-		,lang: 'en'
-		,x:0
-		,y:0
-		,w:0
-		,h:0
-	})
-	.run(function(config,parsedConfig,$translate,SfbLocalStorageModel){
+	.run(function(
+			SfbConfig
+			,parsedConfig
+			,$translate
+		){
 		'use strict';
-		// todo:
-		// 	- load from localStorage
-		//	- extend config with localStorage
-		//  - extend config with parsedConfig
-		angular.extend(config,parsedConfig);
-		console.log('SfbLocalStorageModel.get()',SfbLocalStorageModel.get('x')); // log
-		//
-		if ($translate.uses()!==config.lang) {
-			$translate.uses(config.lang);
+		// extend SfbConfig with parsed config
+		SfbConfig.save(parsedConfig);
+		// check lang on config
+		if ($translate.uses()!==SfbConfig.lang) {
+			$translate.uses(SfbConfig.lang);
 		}
 	})
 ;
 
-/*include sfbInstance.SfbLocalStorageModel.js*/
+/*include sfbInstance.SfbConfig.js*/
 /*include sfbInstance.SfbFilesModel.js*/
 /*include sfbInstance.SfbWindowModel.js*/
 
