@@ -22,7 +22,23 @@
 <script src="js/sfbrowser.js"></script>
 <script>
 	(function () {
-		document.querySelector('button').addEventListener('click',sfbrowser.init,false);
+		document.querySelector('button').addEventListener('click',function(){
+			sfbrowser.init({
+				x: 10
+				,y: 10
+			});
+		},false);
+		setTimeout(function(){
+			sfbrowser.init({
+				directory: 'data'
+				,x: 10
+				,y: 10
+				,lang: 'nl'
+				,callback: function(){
+					console.log('myCallback',arguments);
+				}
+			});
+		},1000);
 	})();
 </script>
 </body>

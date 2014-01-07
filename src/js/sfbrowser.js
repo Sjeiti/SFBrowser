@@ -38,10 +38,9 @@ if (window.sfbrowser===undefined) window.sfbrowser = (function () {
 		angular.bootstrap(oSFB, ['sfbrowser']);
 		oSFBInjector = angular.element(oSFB).injector();
 		/*include sfbInstance/sfbInstance.js*/
-		setTimeout(init,1000);
 	}
-	function init(){
-		oSFBInjector.get('CreateInstance')();
+	function init(config){
+		oSFBInjector.get('CreateInstance')(config);
 	}
 	/*include loadScripts.js*/
 	return {

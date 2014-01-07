@@ -1,9 +1,6 @@
 {
     "globals": {
 		"angular": true
-//		"require": true,
-//		"exports": true,
-//		"signals": true
 	},
     "strict": true,
     "browser": true,

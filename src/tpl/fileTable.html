@@ -1,5 +1,5 @@
 <div class="sfb-filetable"
-	data-ng-show="sfbwin.page===undefined?true:sfbwin.page=='files'"
+	data-ng-show="sfb.page=='files'"
 	data-ng-controller="SfbFileTableController"
 >
 	<table>
@@ -34,8 +34,10 @@
 				data-ng-dblclick="trDblClick(file)"
 				data-ng-repeat="file in files"
 				data-ng-model="file"
+				data-ng-mouseover="trHover(file,$event)"
+				data-ng-mouseleave="trHover(file,$event)"
+				data-ng-class="{hover:file===currentHover,selected:file.selected}"
 				data-sfb-drag="move-files"
-				class="{{file.selected?'selected':''}}"
 			>
 				<td style="{{iconPos(file)}}"><input type="text"
 					data-ng-keyup="fileKeyUp($event)"

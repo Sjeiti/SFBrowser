@@ -1,4 +1,7 @@
-angular.module('sfbInstance').factory( 'SfbWindowModel', function($rootScope) {
+angular.module('sfbInstance').factory( 'SfbWindowModel', function(
+	$rootScope
+	,SfbLocalStorageModel
+) {
 	'use strict';
 	var  xMax = 300
 		,yMax = 300
@@ -10,10 +13,10 @@ angular.module('sfbInstance').factory( 'SfbWindowModel', function($rootScope) {
 		,iLastW
 		,iLastH
 		,oReturn = {
-			x: 10
-			,y: 100
-			,w: 500
-			,h: 300
+			 x: SfbLocalStorageModel.get('x')
+			,y: SfbLocalStorageModel.get('y')
+			,w: SfbLocalStorageModel.get('w')
+			,h: SfbLocalStorageModel.get('h')
 			,windowResize: windowResize
 			,drag: drag
 			,toggleFullscreen: toggleFullscreen
@@ -41,6 +44,12 @@ angular.module('sfbInstance').factory( 'SfbWindowModel', function($rootScope) {
 				resizeW(x);
 				resizeH(y);
 		}
+		SfbLocalStorageModel.save({
+			x: oReturn.x
+			,y: oReturn.y
+			,w: oReturn.w
+			,h: oReturn.h
+		});
 		$rootScope.$emit('windowModelChange');
 	}
 	function toggleFullscreen(){

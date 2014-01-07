@@ -1,16 +1,17 @@
+/*global oSFBInjector*/
 angular.module('sfbInstance').controller('SfbFileTableController',function(
 		$scope
 		,$rootScope
 		,SfbFilesModel
 		,$element
-		,callback
-		,Key
+		,config
 		,SfbWindowModel
 	){
 	'use strict';
 
 	// local variables
-	var mElement = $element[0]
+	var Key = oSFBInjector.get('Key') // we do not use require because sfbrowser must remain a singleton
+		,mElement = $element[0]
 		,mScroll = mElement.querySelector('.scroll')
 		,mMoveFiles = mElement.querySelector('.move-files')
 		,aTables = mElement.querySelectorAll('table')
@@ -19,9 +20,15 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 		,oFileLastClicked
 	;
 
+
 	// bindings
 
-	Key.keyUp(handleKeyUp);
+	Key.keyDown([Key.UP,Key.DOWN,Key.LEFT,Key.RIGHT,Key.SPACE,Key.RETURN],handleKeyDown);
+	Key.keyUp(Key.RETURN,handleKeyUpReturn);
+	Key.keyUp(Key.F2,handleKeyUpF2);
+	Key.keyUp(Key.SPACE,handleKeyUpSpace);
+	Key.keyUp(Key.ESC,handleKeyUpEsc);
+	Key.keyUp([Key.UP,Key.DOWN,Key.LEFT,Key.RIGHT],handleKeyUpArrows);
 
 	$rootScope.$on('heightChanged',handleHeightChanged);
 	$rootScope.$on('widthChanged',handleWidthChanged);
@@ -34,6 +41,7 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 	$scope.fileKeyUp = handleFileKeyUp;
 	$scope.trClick = handleTrClick;
 	$scope.trDblClick = handleTrDblClick;
+	$scope.trHover = handleTrHover;
 	$scope.cancelUpload = SfbFilesModel.abortUpload;
 	$scope.deleteFile = handleDeleteFile;
 	$scope.sortBy = handleSortBy;
@@ -42,8 +50,9 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 	// set scope variables
 
 	$scope.uploads = SfbFilesModel.uploads;
-	setFolder(); // sets $scope.files
 	$scope.moveFiles = [];
+	$scope.currentHover = null;
+	setFolder(); // sets $scope.files
 
 	// functions
 
@@ -79,11 +88,19 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 
 	function handleTrDblClick(file){
 		file.selected = true;
+		finalSelect(file);
+	}
+
+	function finalSelect(file){
 		if (file.type==='dir') {
 			setFolder(file.name);
 		} else {
 			handleSelectFiles();
 		}
+	}
+
+	function handleTrHover(file){
+		$scope.currentHover = file;
 	}
 
 	function handleSelectFiles(){
@@ -93,7 +110,7 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 				aSelected.push(file);
 			}
 		});
-		callback(aSelected);
+		config.callback(aSelected);
 		$rootScope.$emit('close');
 	}
 
@@ -159,17 +176,49 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 		mScroll.style.height = (h-85)+'px';
 	}
 
-	function handleKeyUp(keyCode){
-		if (keyCode===Key.RETURN) {
-			// todo: select file/folder and possibly close
-		} else if (keyCode===Key.SPACE) {
-			// todo: highlight file/folder
-		} else if (keyCode===Key.ESC) {
-			console.log('escape pressed'); // log
-			$rootScope.$emit('close');
-		} else {
+	function handleKeyDown(keyCode,e){
+		e.preventDefault();
+		e.stopPropagation();
+	}
 
+	function handleKeyUpReturn(){
+		if ($scope.currentHover) finalSelect($scope.currentHover);
+	}
+
+	function handleKeyUpF2(){
+		var oEditFile;
+		$scope.files.forEach(function(file){
+			if (!oEditFile&&file.selected) oEditFile = file;
+		});
+		if (oEditFile&&!oEditFile.nameEditing) {
+			checkEnabledInputs();
+			oEditFile.nameEditing = true;
+			$scope.$apply();
 		}
+	}
+
+	function handleKeyUpSpace(){
+		// todo: shift
+		if ($scope.currentHover) {
+			$scope.currentHover.selected = !$scope.currentHover.selected;
+			$scope.$apply();
+		}
+	}
+
+	function handleKeyUpEsc(){
+		$rootScope.$emit('close');
+	}
+
+	function handleKeyUpArrows(keyCode){
+		hoverNextPrev([Key.DOWN,Key.RIGHT].indexOf(keyCode)!==-1);
+	}
+
+	function hoverNextPrev(next){
+		var iIndex = $scope.files.indexOf($scope.currentHover)
+			,iNumFiles = $scope.files.length;
+		$scope.currentHover = $scope.files[iIndex!==-1?(iIndex+iNumFiles+(next?1:-1))%iNumFiles:0];
+		$scope.$apply();
+		// todo: scroll to if outside viewport
 	}
 
 	function handleUpload($onScope,files){
@@ -251,9 +300,11 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 		SfbFilesModel.getList(folder,function(list){
 			$scope.files = list;
 			sortFiles();
-			$scope.$apply();
-			aBodyTd = aTables[1].querySelector('tr').children;
-			handleWidthChanged();
+			setTimeout(function(){
+				$scope.$apply();
+				aBodyTd = aTables[1].querySelector('tr').children;
+				handleWidthChanged();
+			},40);
 		});
 	}
 	function sortFiles(by,bDesc){

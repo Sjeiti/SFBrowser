@@ -166,7 +166,8 @@ module.exports = function (grunt) {
 
 		uglify: {
 			dist: {
-				src: aFiles,
+				//src: aFiles,
+				src: 'dist/js/sfbrowser.js',
 				dest: 'dist/js/sfbrowser.min.js'
 			}
 		},
