@@ -15,6 +15,7 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 			,moveFiles: moveFiles
 			,uploadFiles: uploadFiles
 			,abortUpload: abortUpload
+			,newFolder: newFolder
 		}
 	;
 	function getList(folder,callback){
@@ -113,6 +114,20 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 	function abortUpload(file){
 		if (file.xhr) file.xhr.abort();
 		else removeFromUploads(file);
+	}
+	function newFolder(callback){
+		console.log('folder',callback); // log todo; implement
+		Api.newFolder({
+			folder:encodeURIComponent(oReturn.currentFolder)
+		},function(result) {
+			if (result.success) {
+				console.log('newFolderSuccess',result); // log
+				aCurrentList.push(result.data);
+			} else {
+				console.log('result.error',result.error);
+			}
+			callback(result.success);
+		});
 	}
 	//
 	// lastModified: 1284304240000

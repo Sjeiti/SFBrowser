@@ -1,4 +1,11 @@
-angular.module('sfbInstance').controller('SfbWindowController',function($scope,$rootScope,$element,SfbWindowModel,$timeout) {
+angular.module('sfbInstance').controller('SfbWindowController',function(
+		$scope
+		,$rootScope
+		,$element
+		,SfbWindowModel
+		,$timeout
+		,SfbConfig
+	){
 	'use strict';
 
 	var mElement = $element[0]
@@ -6,6 +13,7 @@ angular.module('sfbInstance').controller('SfbWindowController',function($scope,$
 	;
 
     this.windowModel = SfbWindowModel;
+	this.title = SfbConfig.title;
 
 	$rootScope.$on('fullscreen',SfbWindowModel.toggleFullscreen);
 	$rootScope.$on('windowModelChange',handleWindowModelChange);
@@ -25,9 +33,11 @@ angular.module('sfbInstance').controller('SfbWindowController',function($scope,$
 		if (mElement.offsetTop!==SfbWindowModel.y) {
 			oStyle.top = SfbWindowModel.y+'px';
 		}
-		$timeout(function() {
-			$scope.$apply();
-		});
+//		$timeout(function() {
+//			$scope.$apply();
+//		});
+		setTimeout(function(){$scope.$apply();},40);
 	}
-	$timeout(handleWindowModelChange);
+	//$timeout(handleWindowModelChange);
+	setTimeout(handleWindowModelChange,40);
 });

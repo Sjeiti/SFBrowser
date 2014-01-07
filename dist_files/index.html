@@ -7,6 +7,7 @@
 </head>
 <body>
 <button>test</button>
+<ul id="fileList"></ul>
 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda dolor, enim fugiat hic natus recusandae ut. Consequatur ea eligendi est facilis inventore molestiae odit, officia quaerat quidem temporibus veniam voluptatibus.</p>
 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci architecto asperiores aut dolores eaque esse excepturi fugiat fugit hic illo labore nihil non odio placeat, ratione repellat sunt ullam voluptatem?</p>
 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur consequuntur dicta, molestiae perspiciatis quam quas quisquam? Consectetur delectus earum exercitationem iure labore omnis pariatur perferendis praesentium reiciendis, rerum tempore, temporibus?</p>
@@ -24,7 +25,10 @@
 	(function () {
 		document.querySelector('button').addEventListener('click',function(){
 			sfbrowser.init({
-				folder: 'ImageFolder'
+				id:'img'
+				,folder: 'ImageFolder'
+				,title: 'Choose an image'
+				,callback:selectFiles
 			});
 		},false);
 		setTimeout(function(){
@@ -33,11 +37,26 @@
 				,y: 10
 				,folder: ''
 				,lang: 'nl'
-				,callback: function(){
-					console.log('myCallback',arguments);
-				}
+				,callback:selectFiles
 			});
 		},1000);
+		function selectFiles(files){
+			var mList = document.getElementById('fileList')
+					,mFragment = document.createDocumentFragment();
+			files.forEach(function(file){
+				var mLi = document.createElement('li')
+						,mImg = document.createElement('img');
+				mLi.innerText = file.name;
+				mImg.src = 'data/'+file.path+'/'+file.name;
+				mImg.height = 16;
+				mLi.appendChild(mImg);
+				mFragment.appendChild(mLi);
+				console.log('file',file); // log
+			});
+			mList.innerHTML = '';
+			mList.appendChild(mFragment);
+		}
+
 	})();
 </script>
 </body>

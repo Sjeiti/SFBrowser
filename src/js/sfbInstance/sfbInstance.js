@@ -9,12 +9,9 @@ angular.module('sfbInstance',['ngAnimate','pascalprecht.translate'])
 	})
 	.run(function(
 			SfbConfig
-			,parsedConfig
 			,$translate
 		){
 		'use strict';
-		// extend SfbConfig with parsed config
-		SfbConfig.save(parsedConfig);
 		// check lang on config
 		if ($translate.uses()!==SfbConfig.lang) {
 			$translate.uses(SfbConfig.lang);

@@ -22,11 +22,15 @@ angular.module('sfbInstance').controller('SfbController',function(
 		$rootScope.$emit('selectFiles');
 	};
 
-	$rootScope.$on('view',function(){
-		that.layout = that.layout==='grid'?'list':'grid';
-	});
 	$rootScope.$on('close',function(){
 		$element.remove();
+	});
+	$rootScope.$on('setPage',function(asdf,page){
+		if (that.page!==page) {
+			that.page = page;
+		} else if (page==='files') {
+			that.layout = that.layout==='grid'?'list':'grid';
+		}
 	});
 
 });

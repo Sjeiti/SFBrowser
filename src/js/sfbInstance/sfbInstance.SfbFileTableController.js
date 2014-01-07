@@ -9,6 +9,8 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 	){
 	'use strict';
 
+	// todo: implement file duplication
+
 	// local variables
 	var Key = oSFBInjector.get('Key') // we do not use require because sfbrowser must remain a singleton
 		,mElement = $element[0]
