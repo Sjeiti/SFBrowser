@@ -27,14 +27,7 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 				var bIsRelativeRoot = oReturn.currentFolder===SfbConfig.folder
 					,aRemove = [];
 				aCurrentList.forEach(function(file){
-					var bWH = file.width&&file.height;
-					file.originalName = file.name;
-					file.path = path(SfbConfig.baseFolder,oReturn.currentFolder);
-					file.surface = bWH?file.width*file.height:'';
-					file.dimensions = bWH?(file.width+' x '+file.height):'';
-					file.sizeFormatted = file.type!=='dir'?formatSize(file.size):'';
-					file.nameEditing = false;
-					file.selected = false;
+					processFile(file);
 					if (bIsRelativeRoot&&file.type==='dir'&&file.name==='..'){
 						aRemove.push(file);
 					}
@@ -44,7 +37,7 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 				});
 				callback(aCurrentList);
 			} else {
-				console.log('result.error',result.error); // todo: handle error
+				console.log('result.error',result.error); // todo: handle getList error
 			}
 		});
 	}
@@ -71,7 +64,7 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 					file.originalName = file.name;
 				} else {
 					file.name = file.originalName;
-					console.log('result.error',result.error); // todo: handle error
+					console.log('result.error',result.error); // todo: handle renameFile error
 				}
 				callback(result.success);
 			});
@@ -80,7 +73,6 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 	function moveFiles(files,target,callback){
 		if (target.type==='dir') {
 			if (files.indexOf(target)===-1) {
-//				SfbFilesModel
 				var aFiles = [];
 				files.forEach(function(file){
 					aFiles.push(encodeURIComponent(file.name));
@@ -99,7 +91,7 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 					callback(result.success);
 				});
 			} else {
-				console.log('cannot move inside itself'); // log
+				console.log('cannot move inside itself'); // todo: handle moveFiles error
 			}
 		}
 	}
@@ -116,13 +108,11 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 		else removeFromUploads(file);
 	}
 	function newFolder(callback){
-		console.log('folder',callback); // log todo; implement
 		Api.newFolder({
 			folder:encodeURIComponent(oReturn.currentFolder)
 		},function(result) {
 			if (result.success) {
-				console.log('newFolderSuccess',result); // log
-				aCurrentList.push(result.data);
+				addFilesToList(result.data);
 			} else {
 				console.log('result.error',result.error);
 			}
@@ -164,7 +154,7 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 			;
 			bUploading = false;
 			if (oResponse.success) {
-				aCurrentList.push(oResponse.data.pop());
+				addFilesToList(oResponse.data.pop());
 			}
 			if (!nextUpload()) {
 				complete(oResponse.success);
@@ -188,10 +178,35 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 		var iIndex = aUploads.indexOf(file);
 		aUploads.splice(iIndex,1);
 	}
+	function addFilesToList(files){
+		if (Array.isArray(files)) {
+			files.forEach(processFile);
+			Array.prototype.push.apply(aCurrentList,files);
+		} else {
+			processFile(files);
+			aCurrentList.push(files);
+		}
+	}
+
+	/**
+	 * Adds variables to the file object to be used in the view
+	 * @param {object} file
+	 * @returns {object}
+	 */
+	function processFile(file){
+		var bWH = file.width&&file.height;
+		file.originalName = file.name;
+		file.path = path(SfbConfig.baseFolder,oReturn.currentFolder);
+		file.surface = bWH?file.width*file.height:'';
+		file.dimensions = bWH?(file.width+' x '+file.height):'';
+		file.sizeFormatted = file.type!=='dir'?formatSize(file.size):'';
+		file.nameEditing = false;
+		file.selected = false;
+		return file;
+	}
+
 	/**
 	 * Formats a number to the appropriate filesize notation
-	 * @name iddqd.internal.native.number.formatSize
-	 * @method
 	 * @param {number} int The number to round
 	 * @param {number} round The number of decimals to round by
 	 * @returns {string} Filesize string result
@@ -204,6 +219,12 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 		var iMult = Math.pow(10,round);
 		return (Math.round(size * iMult) / iMult) + aSizes[i];
 	}
+
+	/**
+	 * Builds and cleans a path
+	 * @param {string} [...] Path elements
+	 * @returns {string}
+	 */
 	function path(){
 		var sPath = Array.prototype.join.apply(arguments,['/'])
 			,sPath_;

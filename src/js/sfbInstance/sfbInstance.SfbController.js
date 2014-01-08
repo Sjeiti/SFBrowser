@@ -4,7 +4,8 @@ angular.module('sfbInstance').controller('SfbController',function(
 	,$element
 ) {
 	'use strict';
-	var that = this;
+	var that = this
+		,sFilesPage = 'files';
 	this.layout = 'list';
 	this.menuMain = 'menuMain.html';
 	this.fileTable = 'fileTable.html';
@@ -28,8 +29,10 @@ angular.module('sfbInstance').controller('SfbController',function(
 	$rootScope.$on('setPage',function(asdf,page){
 		if (that.page!==page) {
 			that.page = page;
-		} else if (page==='files') {
+		} else if (page===sFilesPage) {
 			that.layout = that.layout==='grid'?'list':'grid';
+		} else {
+			that.page = sFilesPage;
 		}
 	});
 

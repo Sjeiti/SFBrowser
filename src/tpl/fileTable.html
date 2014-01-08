@@ -39,10 +39,10 @@
 				data-ng-class="{hover:file===currentHover,selected:file.selected}"
 				data-sfb-drag="move-files"
 			>
-				<td style="{{iconPos(file)}}"><input type="text"
-					data-ng-keyup="fileKeyUp($event)"
+				<td data-icon-position><input type="text"
 					data-ng-model="file.name"
-					data-ng-disabled="!file.nameEditing"
+					data-edit-name
+					disabled
 				/></td>
 				<td>{{file.ext}}</td>
 				<td class="smaller">{{file.time*1000|date:'yyyy-MM-dd'}}</td>
@@ -51,6 +51,9 @@
 				<td>
 					<div ng-if="file.type==='file'">
 						<a href="{{file.path+'/'+file.name}}" download="{{file.name}}" class="icon-download" title="{{'download'|translate}}"></a>
+						<button data-ng-click="deleteFile(file)" class="icon-remove" title="{{'delete'|translate}}"></button>
+					</div>
+					<div ng-if="file.type==='dir'">
 						<button data-ng-click="deleteFile(file)" class="icon-remove" title="{{'delete'|translate}}"></button>
 					</div>
 				</td>
@@ -71,5 +74,5 @@
 		</tr>
 		</tbody>
 	</table>
-	<input type="file" multiple />
+	<input id="fileUpload" type="file" multiple />
 </div>

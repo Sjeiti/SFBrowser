@@ -38,10 +38,11 @@ class SfBrowser {
 
 		$app->post('/delete/:file', function($file) {
 			$sFile = urldecode($file);
+			$bDir = is_dir($sFile);
 			if (
 				$this->notError($this->withinRoot($sFile),"Invalid path: '$sFile' not in root folder")
 				&&$this->notError(file_exists($sFile),"The file '$file' does not exist")
-				&&$this->notError(unlink($sFile),"The file '$file' could not be deleted")
+				&&$this->notError($bDir?rmdir($sFile):unlink($sFile),"The ".($bDir?'folder':'file')." '$file' could not be deleted")
 			) {
 				$this->aResponse['success'] = true;
 				$this->aResponse['data'] = $sFile;
@@ -193,8 +194,15 @@ class SfBrowser {
 					$aRtr['height'] = $height;
 				}
 			}
+		} else {
+			$aRtr['empty'] = $this->is_dir_empty($sFile);
 		}
 		return $aRtr;
+	}
+
+	private function is_dir_empty($dir) {
+		if (!is_readable($dir)) return NULL;
+		return (count(scandir($dir))==2);
 	}
 }
 new SfBrowser();

@@ -32,3 +32,5 @@ angular.module('sfbInstance',['ngAnimate','pascalprecht.translate'])
 /*include sfbInstance.SfbDragDirective.js*/
 /*include sfbInstance.SfbResizeDirective.js*/
 /*include sfbInstance.SfbFileDropDirective.js*/
+/*include sfbInstance.SfbEditNameDirective.js*/
+/*include sfbInstance.SfbIconPositionDirective.js*/
