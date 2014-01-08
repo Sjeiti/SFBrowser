@@ -14,6 +14,7 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 	// local variables
 	var Key = oSFBInjector.get('Key') // we do not use require because sfbrowser must remain a singleton
 		,mElement = $element[0]
+		,mFile = mElement.querySelector('input')
 		,mScroll = mElement.querySelector('.scroll')
 		,mMoveFiles = mElement.querySelector('.move-files')
 		,aTables = mElement.querySelectorAll('table')
@@ -21,7 +22,6 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 		,aBodyTd
 		,oFileLastClicked
 	;
-
 
 	// bindings
 
@@ -50,6 +50,10 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 	$scope.deleteFile = handleDeleteFile;
 	$scope.sortBy = handleSortBy;
 	$scope.iconPos = handleIconPosition;
+
+	// event
+
+	mFile.addEventListener('change',handleFileChange,true);
 
 	// set scope variables
 
@@ -226,7 +230,21 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 		// todo: scroll to if outside viewport
 	}
 
-	function handleUploadDrop($onScope,files){
+	function handleUploadDrop(){
+		upload(mFile.files);
+	}
+
+	function handleUpload(){
+		var oEvent = document.createEvent("MouseEvents");
+		oEvent.initMouseEvent("click",true,true,window,1,0,0,0,0,false,false,false,false,0,null);
+		mFile.dispatchEvent(oEvent);
+	}
+
+	function handleFileChange(){
+		upload(mFile.files);
+	}
+
+	function upload(files){
 		if (files.length) {
 			var	aFilesNormalize = []
 				,bOverwriting = false;
@@ -248,10 +266,6 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 				$scope.$apply();
 			}
 		}
-	}
-
-	function handleUpload(){
-		console.log('arguments',arguments); // log
 	}
 
 	function handleMoveFilesStart($targetScope,x,y,startElement){
