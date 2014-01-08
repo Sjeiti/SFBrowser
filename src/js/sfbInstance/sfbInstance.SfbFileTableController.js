@@ -39,6 +39,7 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 	$rootScope.$on('move-files-end',handleMoveFilesEnd);
 	$rootScope.$on('selectFiles',handleSelectFiles);
 	$rootScope.$on('upload',handleUpload);
+	$rootScope.$on('newFolder',handleNewFolder);
 
 	$scope.fileKeyUp = handleFileKeyUp;
 	$scope.trClick = handleTrClick;
@@ -195,6 +196,7 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 		if (oEditFile&&!oEditFile.nameEditing) {
 			checkEnabledInputs();
 			oEditFile.nameEditing = true;
+			// todo: select entire filename
 			$scope.$apply();
 		}
 	}
@@ -275,6 +277,17 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 		}
 		$scope.moveFiles.length = 0;
 		$scope.$apply();
+	}
+
+	function handleNewFolder(){
+		SfbFilesModel.newFolder(function(success,folder){
+			if (success) {
+				sortFiles();
+				folder.nameEditing = true;
+				// todo: select entire filename
+				$scope.$apply();
+			}
+		});
 	}
 
 	function checkEnabledInputs(){

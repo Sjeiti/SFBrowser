@@ -39,6 +39,14 @@ angular.module('sfbrowser').factory('Api',function($resource){
 				,files:'@files'
 			}
 		}
+		,newFolder: {
+			url: sUriAPI+'/newfolder/:base:folder'
+			,method: 'POST'
+			, params:{
+				base:sBase
+				,folder:'@folder'
+			}
+		}
 		/*,upload: {
 			url: sUriAPI+'/upload/:base:folder'
 			,method: 'POST'

@@ -126,7 +126,7 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 			} else {
 				console.log('result.error',result.error);
 			}
-			callback(result.success);
+			callback(result.success,result.data);
 		});
 	}
 	//
