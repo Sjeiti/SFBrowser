@@ -19,18 +19,18 @@ angular.module('sfbInstance',['ngAnimate','pascalprecht.translate'])
 	})
 ;
 
-/*include sfbInstance.SfbConfig.js*/
-/*include sfbInstance.SfbFilesModel.js*/
-/*include sfbInstance.SfbWindowModel.js*/
+/*include model/SfbConfig.js*/
+/*include model/SfbFilesModel.js*/
+/*include model/SfbWindowModel.js*/
 
-/*include sfbInstance.SfbController.js*/
-/*include sfbInstance.SfbWindowController.js*/
-/*include sfbInstance.SfbMenuController.js*/
-/*include sfbInstance.SfbFileTableController.js*/
-/*include sfbInstance.SfbSettingsController.js*/
+/*include controller/SfbInstance.js*/
+/*include controller/SfbWindow.js*/
+/*include controller/SfbMenu.js*/
+/*include controller/SfbFileTable.js*/
+/*include controller/SfbSettings.js*/
 
-/*include sfbInstance.SfbDragDirective.js*/
-/*include sfbInstance.SfbResizeDirective.js*/
-/*include sfbInstance.SfbFileDropDirective.js*/
-/*include sfbInstance.SfbEditNameDirective.js*/
-/*include sfbInstance.SfbIconPositionDirective.js*/
+/*include directive/SfbDrag.js*/
+/*include directive/SfbResize.js*/
+/*include directive/SfbFileDrop.js*/
+/*include directive/SfbEditName.js*/
+/*include directive/SfbIconPosition.js*/

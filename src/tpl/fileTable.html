@@ -1,6 +1,6 @@
 <div class="sfb-filetable"
 	data-ng-show="sfb.page=='files'"
-	data-ng-controller="SfbFileTableController"
+	data-ng-controller="SfbFileTable"
 >
 	<table>
 		<thead>
@@ -53,7 +53,7 @@
 						<a href="{{file.path+'/'+file.name}}" download="{{file.name}}" class="icon-download" title="{{'download'|translate}}"></a>
 						<button data-ng-click="deleteFile(file)" class="icon-remove" title="{{'delete'|translate}}"></button>
 					</div>
-					<div ng-if="file.type==='dir'">
+					<div ng-if="file.type==='dir'&&file.name!=='..'">
 						<button data-ng-click="deleteFile(file)" class="icon-remove" title="{{'delete'|translate}}"></button>
 					</div>
 				</td>

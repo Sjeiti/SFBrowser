@@ -1,4 +1,4 @@
-angular.module('sfbInstance').controller('SfbWindowController',function(
+angular.module('sfbInstance').controller('SfbWindow',function(
 		$scope
 		,$rootScope
 		,$element

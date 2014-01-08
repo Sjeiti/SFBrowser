@@ -1,5 +1,5 @@
 /*global oSFBInjector*/
-angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
+angular.module('sfbInstance').factory('SfbFilesModel', function(SfbConfig){
 	'use strict';
 	var Api = oSFBInjector.get('Api') // we do not use require because sfbrowser must remain a singleton
 //		,sBaseFolder = ''

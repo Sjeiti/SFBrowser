@@ -1,4 +1,4 @@
-angular.module('sfbInstance').controller('SfbMenuController',function(
+angular.module('sfbInstance').controller('SfbMenu',function(
 	$scope
 	,$rootScope
 ){

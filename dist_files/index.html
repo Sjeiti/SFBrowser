@@ -49,7 +49,7 @@
 				var mLi = document.createElement('li')
 						,mImg = document.createElement('img');
 				mLi.innerText = file.name;
-				mImg.src = 'data/'+file.path+'/'+file.name;
+				mImg.src = file.path+'/'+file.name;
 				mImg.height = 16;
 				mLi.appendChild(mImg);
 				mFragment.appendChild(mLi);

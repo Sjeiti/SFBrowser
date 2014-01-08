@@ -1,4 +1,4 @@
-angular.module('sfbInstance').factory( 'SfbWindowModel', function(
+angular.module('sfbInstance').factory('SfbWindowModel', function(
 	$rootScope
 	,SfbConfig
 ) {

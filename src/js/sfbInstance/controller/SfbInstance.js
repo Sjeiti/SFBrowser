@@ -1,4 +1,4 @@
-angular.module('sfbInstance').controller('SfbController',function(
+angular.module('sfbInstance').controller('SfbInstance',function(
 	$scope
 	,$rootScope
 	,$element

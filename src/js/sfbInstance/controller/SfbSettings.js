@@ -1,4 +1,4 @@
-angular.module('sfbInstance').controller('SfbSettingsController',function(
+angular.module('sfbInstance').controller('SfbSettings',function(
 	$scope
 	,$translate
 	,SfbConfig

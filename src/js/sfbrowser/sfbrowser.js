@@ -4,6 +4,6 @@ angular.module('sfbrowser',['ngResource'])
 		$injector.get('$compile')(decodeURIComponent('/*include -e ../../../temp/templates.html*/'));
 	})
 ;
-/*include sfbrowser.Key.js*/
-/*include sfbrowser.Api.js*/
-/*include sfbrowser.CreateInstance.js*/
+/*include service/Key.js*/
+/*include service/Api.js*/
+/*include service/CreateInstance.js*/

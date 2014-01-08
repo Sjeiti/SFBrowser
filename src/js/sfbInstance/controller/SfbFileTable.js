@@ -1,10 +1,10 @@
 /*global oSFBInjector*/
-angular.module('sfbInstance').controller('SfbFileTableController',function(
+angular.module('sfbInstance').controller('SfbFileTable',function(
 		$scope
 		,$rootScope
-		,SfbFilesModel
 		,$element
 		,SfbConfig
+		,SfbFilesModel
 		,SfbWindowModel
 	){
 	'use strict';
@@ -88,7 +88,7 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 				oFileLastClicked = file;
 				$scope.$apply();
 			}
-		},500);
+		},200);
 	}
 
 	function handleTrDblClick(file){
@@ -181,7 +181,6 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 	function editFileName(file){
 		checkEnabledInputs();
 		file.nameEditing = true;
-		// todo: select entire filename
 		$scope.$apply();
 		console.log('editFileName',file); // log
 	}
@@ -195,6 +194,7 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 	}
 
 	function handleKeyUpEsc(){
+		// todo: not close when editing name
 		$rootScope.$emit('close');
 	}
 
