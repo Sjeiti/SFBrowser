@@ -29,7 +29,7 @@ angular.module('sfbInstance').factory( 'SfbFilesModel', function(SfbConfig){
 				aCurrentList.forEach(function(file){
 					var bWH = file.width&&file.height;
 					file.originalName = file.name;
-					file.path = oReturn.currentFolder;
+					file.path = path(SfbConfig.baseFolder,oReturn.currentFolder);
 					file.surface = bWH?file.width*file.height:'';
 					file.dimensions = bWH?(file.width+' x '+file.height):'';
 					file.sizeFormatted = file.type!=='dir'?formatSize(file.size):'';

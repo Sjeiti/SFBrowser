@@ -4,6 +4,7 @@ angular.module('sfbInstance').factory('SfbConfig',function(parsedConfig){
 			id: 'SFBrowser'
 			,title: 'SFBrowser'
 			,folder: ''
+			,baseFolder: ''
 			,lang: 'en'
 			,x:0
 			,y:0
