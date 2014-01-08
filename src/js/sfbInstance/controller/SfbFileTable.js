@@ -18,6 +18,7 @@ angular.module('sfbInstance').controller('SfbFileTable',function(
 		,mFile = mElement.querySelector('#fileUpload')
 		,mScroll = mElement.querySelector('.scroll')
 		,mMoveFiles = mElement.querySelector('.move-files')
+		,mTextarea = mElement.querySelector('textarea')
 		,aTables = mElement.querySelectorAll('table')
 		,aHeadTd = aTables[0].querySelector('tr').children
 		,aBodyTd
@@ -33,6 +34,7 @@ angular.module('sfbInstance').controller('SfbFileTable',function(
 	Key.keyUp(Key.SPACE,handleKeyUpSpace);
 	Key.keyUp(Key.ESC,handleKeyUpEsc);
 	Key.keyUp([Key.UP,Key.DOWN,Key.LEFT,Key.RIGHT],handleKeyUpArrows);
+	Key.keyDown([Key.CTRL,'c'],handleCTRLC,true);
 
 	$rootScope.$on('heightChanged',handleHeightChanged);
 	$rootScope.$on('widthChanged',handleWidthChanged);
@@ -88,7 +90,7 @@ angular.module('sfbInstance').controller('SfbFileTable',function(
 				oFileLastClicked = file;
 				$scope.$apply();
 			}
-		},200);
+		},100);
 	}
 
 	function handleTrDblClick(file){
@@ -200,6 +202,15 @@ angular.module('sfbInstance').controller('SfbFileTable',function(
 
 	function handleKeyUpArrows(keyCode){
 		hoverNextPrev([Key.DOWN,Key.RIGHT].indexOf(keyCode)!==-1);
+	}
+
+	function handleCTRLC(){
+		var aCopy = [];
+		$scope.files.forEach(function(file){
+			if (file.selected) aCopy.push(file.name);
+		});
+		mTextarea.innerText = aCopy.join("\n");
+		mTextarea.select();
 	}
 
 	function hoverNextPrev(next){

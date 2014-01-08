@@ -67,7 +67,7 @@
 			data-ng-repeat="file in moveFiles"
 			data-ng-model="file"
 		>
-			<td style="{{iconPos(file)}}"><input type="text"
+			<td data-icon-position><input type="text"
 				data-ng-model="file.name"
 				data-ng-disabled="true"
 			/></td>
@@ -75,4 +75,5 @@
 		</tbody>
 	</table>
 	<input id="fileUpload" type="file" multiple />
+	<textarea></textarea>
 </div>
