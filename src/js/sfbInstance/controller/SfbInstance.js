@@ -2,6 +2,7 @@ angular.module('sfbInstance').controller('SfbInstance',function(
 	$scope
 	,$rootScope
 	,$element
+	,SfbConfig
 ) {
 	'use strict';
 	var that = this
@@ -10,6 +11,8 @@ angular.module('sfbInstance').controller('SfbInstance',function(
 	this.menuMain = 'menuMain.html';
 	this.fileTable = 'fileTable.html';
 	this.settings = 'settings.html';
+	this.id = SfbConfig.id;
+	console.log('this.id',this.id); // log
 
 	this.page = 'files';
 

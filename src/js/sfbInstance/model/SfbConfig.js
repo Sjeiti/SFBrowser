@@ -1,7 +1,7 @@
 angular.module('sfbInstance').factory('SfbConfig',function(parsedConfig){
 	'use strict';
 	var	oDefaultModel = {
-			id: 'SFBrowser'
+			id: ''
 			,title: 'SFBrowser'
 			,folder: ''
 			,baseFolder: ''
