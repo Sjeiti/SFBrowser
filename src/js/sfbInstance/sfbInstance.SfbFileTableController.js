@@ -38,6 +38,7 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 	$rootScope.$on('move-files',handleMoveFiles);
 	$rootScope.$on('move-files-end',handleMoveFilesEnd);
 	$rootScope.$on('selectFiles',handleSelectFiles);
+	$rootScope.$on('uploadDrop',handleUploadDrop);
 	$rootScope.$on('upload',handleUpload);
 	$rootScope.$on('newFolder',handleNewFolder);
 
@@ -225,7 +226,7 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 		// todo: scroll to if outside viewport
 	}
 
-	function handleUpload($onScope,files){
+	function handleUploadDrop($onScope,files){
 		if (files.length) {
 			var	aFilesNormalize = []
 				,bOverwriting = false;
@@ -247,6 +248,10 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 				$scope.$apply();
 			}
 		}
+	}
+
+	function handleUpload(){
+		console.log('arguments',arguments); // log
 	}
 
 	function handleMoveFilesStart($targetScope,x,y,startElement){
@@ -285,6 +290,7 @@ angular.module('sfbInstance').controller('SfbFileTableController',function(
 				sortFiles();
 				folder.nameEditing = true;
 				// todo: select entire filename
+				// todo: fix previously changing filenames
 				$scope.$apply();
 			}
 		});

@@ -145,12 +145,17 @@ class SfBrowser {
 
 		$app->post('/newfolder/:folder', function($folder) {
 			$sFolder = urldecode($folder);
-			$sName = 'NewFolder'.rand(0,9999);
-			$sTarget = $sFolder.'/'.$sName;
+			//
+			$iNameNr = 0;
+			$sNameBase = $sFolder.'/'.'NewFolder';
+			$sTarget = $sNameBase.$iNameNr;
+			while (file_exists($sTarget)&&is_dir($sTarget)) {
+				$sTarget = $sNameBase.($iNameNr++);
+			}
 			if (
 				$this->notError($this->withinRoot($sFolder),"Invalid path: '$sFolder' not in root folder")
 				// todo: check $sFileTo is within root
-				&&$this->notError(mkdir($sTarget),"The folder '$sName' could not be created")
+				&&$this->notError(mkdir($sTarget),"The folder '$sTarget' could not be created")
 			) {
 				$this->aResponse['success'] = true;
 				$this->aResponse['data'] = $this->fileInfo($sTarget);

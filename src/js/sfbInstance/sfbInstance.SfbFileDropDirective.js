@@ -14,7 +14,7 @@ angular.module('sfbInstance').directive('sfbFileDrop', function($rootScope) {
 		function handleDrop(e){
 			e.stopPropagation();
 			e.preventDefault();
-			$rootScope.$emit('upload',e.dataTransfer.files);
+			$rootScope.$emit('uploadDrop',e.dataTransfer.files);
 		}
 	}
 	return { link: link };
